@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Garimpa Drink — Bares SP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --magenta: #BA1971;
+    --pink: #E27CA8;
+    --blue: #2D5DF0;
+    --indigo: #241A8C;
+    --rust: #9C4A1E;
+    --bg: #15101a;
+    --card: #1f1722;
+    --accent: var(--pink);
+    --text: #f5eef2;
+    --muted: #ab93a5;
+    --green: #5fae6e;
+    --red: #c98a8a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 40px;
+  }
+  header {
+    padding: 20px 16px 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 1px solid #2e2430;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .logo-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--magenta);
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .logo-mark .sq {
+    position: absolute;
+    width: 19px;
+    height: 19px;
+    background: #fff;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .logo-mark .ci {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--blue);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .logo-mark .ha {
+    position: absolute;
+    width: 11px;
+    height: 5.5px;
+    border-radius: 11px 11px 0 0;
+    background: #f0a93c;
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0;
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #3a2e38;
+    background: #1f1722;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  .filters {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-top: 10px;
+    padding-bottom: 4px;
+  }
+  .filters select {
+    flex: 1;
+    min-width: 110px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #3a2e38;
+    background: #1f1722;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+  }
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 8px 6px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #3a2e38;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    background: #1f1722;
+  }
+  .toggle-btn.active {
+    border-color: var(--magenta);
+    color: #fff;
+    background: var(--magenta);
+  }
+  main {
+    padding: 12px 16px;
+  }
+  .count {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 6px 2px 12px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid #2e2430;
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .bar-name {
+    font-size: 16.5px;
+    font-weight: 700;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+  .badge.visited { background: rgba(45, 93, 240, 0.18); color: var(--blue); }
+  .badge.notvisited { background: rgba(186, 25, 113, 0.16); color: var(--pink); }
+  .meta {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+  .meta span b { color: var(--text); font-weight: 500; }
+  .ig-link {
+    margin-top: 8px;
+    display: inline-block;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <h1>Garimpa Drink</h1>
+  </div>
+  <div class="subtitle">Busque por nome, Instagram, bairro ou estilo</div>
+  <input type="text" id="search" placeholder="Buscar bar, @instagram, bairro, estilo...">
+  <div class="filters">
+    <select id="bairroFilter"><option value="">Todos os bairros</option></select>
+    <select id="estiloFilter"><option value="">Todos os estilos</option></select>
+  </div>
+  <div class="toggle-row">
+    <div class="toggle-btn active" data-val="all">Todos</div>
+    <div class="toggle-btn" data-val="visited">Já visitados</div>
+    <div class="toggle-btn" data-val="notvisited">Não visitados</div>
+  </div>
+</header>
+<main>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+  const searchInput = document.getElementById('search');
+  const bairroFilter = document.getElementById('bairroFilter');
+  const estiloFilter = document.getElementById('estiloFilter');
+  const listEl = document.getElementById('list');
+  const countEl = document.getElementById('count');
+  const toggleBtns = document.querySelectorAll('.toggle-btn');
+  let visitedMode = 'all';
+
+  const data = BARES.filter(b => b.bar && b.bar.trim() !== '');
+
+  function uniqueSorted(field) {
+    return [...new Set(data.map(b => b[field]).filter(v => v && v.trim() !== ''))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }
+
+  uniqueSorted('bairro').forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    bairroFilter.appendChild(opt);
+  });
+  uniqueSorted('estilo').forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    estiloFilter.appendChild(opt);
+  });
+
+  function normalize(s) {
+    return (s || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function render() {
+    const q = normalize(searchInput.value.trim());
+    const bairro = bairroFilter.value;
+    const estilo = estiloFilter.value;
+
+    const filtered = data.filter(b => {
+      if (visitedMode === 'visited' && !b.visitado) return false;
+      if (visitedMode === 'notvisited' && b.visitado) return false;
+      if (bairro && b.bairro !== bairro) return false;
+      if (estilo && b.estilo !== estilo) return false;
+      if (q) {
+        const haystack = normalize(`${b.bar} ${b.instagram} ${b.bairro} ${b.estilo}`);
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const totalVisited = data.filter(b => b.visitado).length;
+    countEl.textContent = `${filtered.length} resultado(s) — já visitados: ${totalVisited} de ${data.length}`;
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div class="empty">Nenhum bar encontrado 🙁</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(b => `
+      <div class="card">
+        <div class="card-top">
+          <div class="bar-name">${escapeHtml(b.bar)}</div>
+          <div class="badge ${b.visitado ? 'visited' : 'notvisited'}">${b.visitado ? 'Visitado' : 'Não visitado'}</div>
+        </div>
+        <div class="meta">
+          ${b.bairro ? `<span>📍 <b>${escapeHtml(b.bairro)}</b></span>` : ''}
+          ${b.estilo ? `<span>🍹 <b>${escapeHtml(b.estilo)}</b></span>` : ''}
+        </div>
+        ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener">📷 Ver Instagram</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(s) {
+    return (s || '').toString()
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  searchInput.addEventListener('input', render);
+  bairroFilter.addEventListener('change', render);
+  estiloFilter.addEventListener('change', render);
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      visitedMode = btn.dataset.val;
+      render();
+    });
+  });
+
+  render();
+</script>
+</body>
+</html>
