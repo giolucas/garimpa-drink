@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Garimpa Drink — Bares SP</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23BA1971'/%3E%3Crect x='17' y='17' width='30' height='30' fill='%23ffffff'/%3E%3Ccircle cx='32' cy='32' r='13' fill='%232D5DF0'/%3E%3Cpath d='M21 34a11 11 0 0 1 22 0z' fill='%23f0a93c'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#15101a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -437,7 +441,7 @@
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
-  <div class="subtitle">O básico para você beber além do básico em São Paulo.<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <div class="subtitle">O básico para você beber além do básico em São Paulo. (Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
   <div class="account-bar" id="accountBar"></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
@@ -459,7 +463,7 @@
 <script src="data.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -487,10 +491,15 @@
   gateGoogleBtn.innerHTML = `${googleIconSvg} Entrar com Google`;
   gateGoogleBtn.addEventListener('click', () => {
     gateError.textContent = '';
-    signInWithPopup(auth, googleProvider).catch((err) => {
+    signInWithRedirect(auth, googleProvider).catch((err) => {
       console.error(err);
       gateError.textContent = 'Não foi possível entrar com Google. Tente novamente.';
     });
+  });
+
+  getRedirectResult(auth).catch((err) => {
+    console.error('Erro no redirect do Google', err);
+    gateError.textContent = 'Não foi possível entrar com Google. Tente novamente.';
   });
 
   function renderAccountBar() {

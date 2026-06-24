@@ -1,0 +1,12 @@
+{
+  "name": "Garimpa Drink — Bares SP",
+  "short_name": "Garimpa Drink",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#15101a",
+  "theme_color": "#15101a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
