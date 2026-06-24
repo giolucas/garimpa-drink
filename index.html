@@ -93,6 +93,15 @@
     font-size: 13px;
     color: var(--muted);
     margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .subtitle a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .subtitle .age-notice {
+    display: block;
   }
   input[type="text"] {
     width: 100%;
@@ -146,6 +155,37 @@
     color: #fff;
     background: var(--magenta);
   }
+  .heart-btn {
+    appearance: none;
+    border: none;
+    background: none;
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+    color: #4a3f47;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+  .heart-btn.fav { color: var(--magenta); }
+  .heart-btn:active { transform: scale(1.25); }
+  .bookmark-btn {
+    appearance: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    line-height: 1;
+    color: #4a3f47;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    transition: transform 0.15s ease;
+  }
+  .bookmark-btn svg path { fill: none; transition: fill 0.15s ease; }
+  .bookmark-btn.active { color: var(--blue); }
+  .bookmark-btn.active svg path { fill: var(--blue); }
+  .bookmark-btn:active { transform: scale(1.2); }
   main {
     padding: 12px 16px;
   }
@@ -166,6 +206,12 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 8px;
+  }
+  .card-top-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
   }
   .bar-name {
     font-size: 16.5px;
@@ -189,10 +235,23 @@
     gap: 6px 14px;
   }
   .meta span b { color: var(--text); font-weight: 500; }
+  .estilo-pill {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: transparent;
+    color: #fff;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+  }
+  .estilo-pill:active { transform: scale(0.96); }
   .ig-link {
-    margin-top: 8px;
-    display: inline-block;
-    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 4px;
     color: var(--accent);
     text-decoration: none;
   }
@@ -202,24 +261,100 @@
     padding: 40px 0;
     font-size: 14px;
   }
+  #gate {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  #gate.hidden { display: none; }
+  .gate-box {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+  .gate-box .logo-mark {
+    margin: 0 auto 16px;
+    width: 48px;
+    height: 48px;
+  }
+  .gate-box .logo-mark .sq { width: 27px; height: 27px; }
+  .gate-box .logo-mark .ci { width: 22px; height: 22px; }
+  .gate-box .logo-mark .ha { width: 15px; height: 7.5px; }
+  .gate-box h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+  }
+  .gate-box p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .gate-box input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #3a2e38;
+    background: #1f1722;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .gate-box input:focus { border-color: var(--accent); }
+  .gate-box button {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--magenta);
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .gate-error {
+    color: var(--red);
+    font-size: 12.5px;
+    margin-top: 10px;
+    min-height: 16px;
+  }
 </style>
 </head>
 <body>
+<div id="gate">
+  <div class="gate-box">
+    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <h2>Garimpa Drink</h2>
+    <p>Acesso restrito. Digite a senha para entrar.</p>
+    <form id="gateForm">
+      <input type="password" id="gatePassword" placeholder="Senha" autocomplete="current-password">
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
 <header>
   <div class="brand">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
-  <div class="subtitle">Busque por nome, Instagram, bairro ou estilo</div>
-  <input type="text" id="search" placeholder="Buscar bar, @instagram, bairro, estilo...">
+  <div class="subtitle">O básico para você beber além do básico em São Paulo.<br>Por Giovanni Lucas <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
-    <select id="bairroFilter"><option value="">Todos os bairros</option></select>
-    <select id="estiloFilter"><option value="">Todos os estilos</option></select>
+    <select id="bairroFilter"><option value="">Bairros</option></select>
+    <select id="estiloFilter"><option value="">Categoria</option></select>
   </div>
   <div class="toggle-row">
     <div class="toggle-btn active" data-val="all">Todos</div>
-    <div class="toggle-btn" data-val="visited">Já visitados</div>
-    <div class="toggle-btn" data-val="notvisited">Não visitados</div>
+    <div class="toggle-btn" data-val="visited">Visitados</div>
+    <div class="toggle-btn" data-val="favorites">Favoritos</div>
   </div>
 </header>
 <main>
@@ -229,6 +364,30 @@
 
 <script src="data.js"></script>
 <script>
+  const GATE_KEY = 'garimpa_acesso';
+  const GATE_PASSWORD = 'penicilinbrasil';
+  const gateEl = document.getElementById('gate');
+  const gateForm = document.getElementById('gateForm');
+  const gatePassword = document.getElementById('gatePassword');
+  const gateError = document.getElementById('gateError');
+
+  if (localStorage.getItem(GATE_KEY) === 'ok') {
+    gateEl.classList.add('hidden');
+  }
+
+  gateForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (gatePassword.value === GATE_PASSWORD) {
+      localStorage.setItem(GATE_KEY, 'ok');
+      gateEl.classList.add('hidden');
+      gateError.textContent = '';
+    } else {
+      gateError.textContent = 'Senha incorreta. Tente novamente.';
+      gatePassword.value = '';
+      gatePassword.focus();
+    }
+  });
+
   const searchInput = document.getElementById('search');
   const bairroFilter = document.getElementById('bairroFilter');
   const estiloFilter = document.getElementById('estiloFilter');
@@ -238,6 +397,40 @@
   let visitedMode = 'all';
 
   const data = BARES.filter(b => b.bar && b.bar.trim() !== '');
+  data.forEach((b, i) => { b._id = i; });
+
+  const FAV_KEY = 'garimpa_favoritos';
+  let favoritos = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+
+  function saveFavoritos() {
+    localStorage.setItem(FAV_KEY, JSON.stringify([...favoritos]));
+  }
+
+  function toggleFavorito(id) {
+    if (favoritos.has(id)) favoritos.delete(id);
+    else favoritos.add(id);
+    saveFavoritos();
+    render();
+  }
+
+  const VISITED_KEY = 'garimpa_visitados_v2';
+  const visitedStored = localStorage.getItem(VISITED_KEY);
+  let visitados = new Set(visitedStored ? JSON.parse(visitedStored) : []);
+
+  function saveVisitados() {
+    localStorage.setItem(VISITED_KEY, JSON.stringify([...visitados]));
+  }
+
+  function toggleVisitado(id) {
+    if (visitados.has(id)) visitados.delete(id);
+    else visitados.add(id);
+    saveVisitados();
+    render();
+  }
+
+  const bookmarkIconPath = 'M7 4h10a1 1 0 0 1 1 1v15l-6-4.5L6 20V5a1 1 0 0 1 1-1z';
+
+  const igIconSvg = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>`;
 
   function uniqueSorted(field) {
     return [...new Set(data.map(b => b[field]).filter(v => v && v.trim() !== ''))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
@@ -264,8 +457,8 @@
     const estilo = estiloFilter.value;
 
     const filtered = data.filter(b => {
-      if (visitedMode === 'visited' && !b.visitado) return false;
-      if (visitedMode === 'notvisited' && b.visitado) return false;
+      if (visitedMode === 'visited' && !visitados.has(b._id)) return false;
+      if (visitedMode === 'favorites' && !favoritos.has(b._id)) return false;
       if (bairro && b.bairro !== bairro) return false;
       if (estilo && b.estilo !== estilo) return false;
       if (q) {
@@ -275,11 +468,17 @@
       return true;
     });
 
-    const totalVisited = data.filter(b => b.visitado).length;
-    countEl.textContent = `${filtered.length} resultado(s) — já visitados: ${totalVisited} de ${data.length}`;
+    let labelExtra;
+    if (visitedMode === 'favorites') labelExtra = ` — ♥ ${favoritos.size} favorito(s)`;
+    else if (visitedMode === 'visited') labelExtra = ` — visitados: ${visitados.size} de ${data.length}`;
+    else labelExtra = ` — já visitados: ${visitados.size} de ${data.length}`;
+    countEl.textContent = `${filtered.length} resultado(s)${labelExtra}`;
 
     if (filtered.length === 0) {
-      listEl.innerHTML = '<div class="empty">Nenhum bar encontrado 🙁</div>';
+      let emptyMsg = 'Nenhum bar encontrado 🙁';
+      if (visitedMode === 'favorites') emptyMsg = 'Você ainda não favoritou nenhum bar. Toque no ♡ de um card para adicionar.';
+      else if (visitedMode === 'visited') emptyMsg = 'Você ainda não marcou nenhum bar como visitado. Toque no 🔖 de um card para marcar.';
+      listEl.innerHTML = `<div class="empty">${emptyMsg}</div>`;
       return;
     }
 
@@ -287,15 +486,48 @@
       <div class="card">
         <div class="card-top">
           <div class="bar-name">${escapeHtml(b.bar)}</div>
-          <div class="badge ${b.visitado ? 'visited' : 'notvisited'}">${b.visitado ? 'Visitado' : 'Não visitado'}</div>
+          <div class="card-top-right">
+            ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener" aria-label="Ver Instagram">${igIconSvg}</a>` : ''}
+            <button class="bookmark-btn ${visitados.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="visit" aria-label="Marcar como visitado">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${bookmarkIconPath}"/></svg>
+            </button>
+            <button class="heart-btn ${favoritos.has(b._id) ? 'fav' : ''}" data-id="${b._id}" data-action="fav" aria-label="Favoritar">${favoritos.has(b._id) ? '♥' : '♡'}</button>
+          </div>
         </div>
         <div class="meta">
-          ${b.bairro ? `<span>📍 <b>${escapeHtml(b.bairro)}</b></span>` : ''}
-          ${b.estilo ? `<span>🍹 <b>${escapeHtml(b.estilo)}</b></span>` : ''}
+          ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
+          ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
         </div>
-        ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener">📷 Ver Instagram</a>` : ''}
       </div>
     `).join('');
+
+    listEl.querySelectorAll('[data-action="estilo"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        estiloFilter.value = btn.dataset.estilo;
+        render();
+      });
+    });
+    listEl.querySelectorAll('[data-action="bairro"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bairroFilter.value = btn.dataset.bairro;
+        render();
+      });
+    });
+    listEl.querySelectorAll('[data-action="fav"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleFavorito(Number(btn.dataset.id)));
+    });
+    listEl.querySelectorAll('[data-action="visit"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleVisitado(Number(btn.dataset.id)));
+    });
+  }
+
+  function instagramHandle(url) {
+    try {
+      const path = new URL(url).pathname.replace(/^\/+|\/+$/g, '');
+      return '@' + decodeURIComponent(path.split('/')[0]);
+    } catch (e) {
+      return url;
+    }
   }
 
   function escapeHtml(s) {
