@@ -228,6 +228,7 @@
     padding: 14px 16px;
     margin-bottom: 10px;
     border: 1px solid #2e2430;
+    cursor: pointer;
   }
   .card-top {
     display: flex;
@@ -597,6 +598,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAwtWbRTRVkTL31ZJuh60UFRS4CIny4o3U",
@@ -611,8 +613,17 @@
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
+  const analytics = getAnalytics(firebaseApp);
   const googleProvider = new GoogleAuthProvider();
   let currentUser = null;
+
+  window.trackEvent = function (eventName, params) {
+    try {
+      logEvent(analytics, eventName, params || {});
+    } catch (err) {
+      console.error('Erro ao registrar evento no GA', err);
+    }
+  };
 
   const accountBar = document.getElementById('accountBar');
   const gateEl = document.getElementById('gate');
@@ -677,7 +688,10 @@
         e.stopPropagation();
         accountMenu.classList.toggle('open');
       });
-      document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        window.trackEvent('logout');
+        signOut(auth);
+      });
       document.addEventListener('click', () => accountMenu.classList.remove('open'), { once: true });
     } else {
       accountBar.innerHTML = '';
@@ -731,9 +745,11 @@
   }
 
   onAuthStateChanged(auth, async (user) => {
+    const wasLoggedOut = !currentUser;
     currentUser = user;
     renderAccountBar();
     if (user) {
+      if (wasLoggedOut) window.trackEvent('login', { method: 'google' });
       await loadFromCloud(user.uid);
     }
   });
@@ -806,10 +822,15 @@
   }
 
   function toggleFavorito(id) {
+    const isAdding = !favoritos.has(id);
     if (favoritos.has(id)) favoritos.delete(id);
     else favoritos.add(id);
     saveFavoritos();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.trackEvent) {
+      const b = data.find(item => item._id === id);
+      window.trackEvent(isAdding ? 'add_favorito' : 'remove_favorito', { bar_name: b ? b.bar : id });
+    }
     render();
   }
 
@@ -822,10 +843,15 @@
   }
 
   function toggleEmbreve(id) {
+    const isAdding = !embreve.has(id);
     if (embreve.has(id)) embreve.delete(id);
     else embreve.add(id);
     saveEmbreve();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.trackEvent) {
+      const b = data.find(item => item._id === id);
+      window.trackEvent(isAdding ? 'add_embreve' : 'remove_embreve', { bar_name: b ? b.bar : id });
+    }
     render();
   }
 
@@ -838,10 +864,15 @@
   }
 
   function toggleVisitado(id) {
+    const isAdding = !visitados.has(id);
     if (visitados.has(id)) visitados.delete(id);
     else visitados.add(id);
     saveVisitados();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.trackEvent) {
+      const b = data.find(item => item._id === id);
+      window.trackEvent(isAdding ? 'add_visitado' : 'remove_visitado', { bar_name: b ? b.bar : id });
+    }
     render();
   }
 
@@ -927,6 +958,7 @@
     });
     renderMenuLists();
     barDetail.classList.remove('hidden');
+    if (window.trackEvent) window.trackEvent('view_bar_detail', { bar_name: b.bar, bairro: b.bairro || '', estilo: b.estilo || '' });
   }
 
   function closeBarDetail() {
@@ -939,9 +971,11 @@
     if (e.target === barDetail) closeBarDetail();
   });
   detailReservarBtn.addEventListener('click', () => {
+    if (window.trackEvent) window.trackEvent('click_reservar', { bar_name: detailBar ? detailBar.bar : '' });
     alert('Em breve você poderá reservar direto pelo app.');
   });
   detailOfertaBtn.addEventListener('click', () => {
+    if (window.trackEvent) window.trackEvent('click_oferta', { bar_name: detailBar ? detailBar.bar : '' });
     alert('Em breve as ofertas deste bar aparecerão aqui.');
   });
 
@@ -1001,9 +1035,9 @@
     }
 
     listEl.innerHTML = filtered.map(b => `
-      <div class="card">
+      <div class="card" data-action="detail" data-id="${b._id}">
         <div class="card-top">
-          <div class="bar-name" data-action="detail" data-id="${b._id}">${escapeHtml(b.bar)}</div>
+          <div class="bar-name">${escapeHtml(b.bar)}</div>
           <div class="card-top-right">
             ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener" aria-label="Ver Instagram">${igIconSvg}</a>` : ''}
             <button class="pin-btn ${visitados.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="visit" aria-label="Marcar como visitado" title="Visitados: marque os bares que você já foi">
@@ -1023,28 +1057,47 @@
     `).join('');
 
     listEl.querySelectorAll('[data-action="estilo"]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         estiloFilter.value = btn.dataset.estilo;
+        if (window.trackEvent) window.trackEvent('filter_estilo', { estilo: btn.dataset.estilo });
         render();
       });
     });
     listEl.querySelectorAll('[data-action="bairro"]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         bairroFilter.value = btn.dataset.bairro;
+        if (window.trackEvent) window.trackEvent('filter_bairro', { bairro: btn.dataset.bairro });
         render();
       });
     });
     listEl.querySelectorAll('[data-action="fav"]').forEach(btn => {
-      btn.addEventListener('click', () => toggleFavorito(Number(btn.dataset.id)));
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFavorito(Number(btn.dataset.id));
+      });
     });
     listEl.querySelectorAll('[data-action="embreve"]').forEach(btn => {
-      btn.addEventListener('click', () => toggleEmbreve(Number(btn.dataset.id)));
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleEmbreve(Number(btn.dataset.id));
+      });
     });
     listEl.querySelectorAll('[data-action="visit"]').forEach(btn => {
-      btn.addEventListener('click', () => toggleVisitado(Number(btn.dataset.id)));
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleVisitado(Number(btn.dataset.id));
+      });
     });
-    listEl.querySelectorAll('[data-action="detail"]').forEach(btn => {
-      btn.addEventListener('click', () => openBarDetail(Number(btn.dataset.id)));
+    listEl.querySelectorAll('[data-action="detail"]').forEach(card => {
+      card.addEventListener('click', () => openBarDetail(Number(card.dataset.id)));
+    });
+    listEl.querySelectorAll('.ig-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (window.trackEvent) window.trackEvent('click_instagram', { url: link.href });
+      });
     });
   }
 
@@ -1062,14 +1115,29 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  searchInput.addEventListener('input', render);
-  bairroFilter.addEventListener('change', render);
-  estiloFilter.addEventListener('change', render);
+  let searchTrackTimeout = null;
+  searchInput.addEventListener('input', () => {
+    render();
+    clearTimeout(searchTrackTimeout);
+    searchTrackTimeout = setTimeout(() => {
+      const term = searchInput.value.trim();
+      if (term && window.trackEvent) window.trackEvent('search', { search_term: term });
+    }, 800);
+  });
+  bairroFilter.addEventListener('change', () => {
+    if (window.trackEvent) window.trackEvent('filter_bairro', { bairro: bairroFilter.value || 'todos' });
+    render();
+  });
+  estiloFilter.addEventListener('change', () => {
+    if (window.trackEvent) window.trackEvent('filter_estilo', { estilo: estiloFilter.value || 'todas' });
+    render();
+  });
   toggleBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       toggleBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       visitedMode = btn.dataset.val;
+      if (window.trackEvent) window.trackEvent('toggle_mode', { mode: visitedMode });
       render();
     });
   });
