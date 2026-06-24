@@ -241,6 +241,7 @@
   .bar-name {
     font-size: 16.5px;
     font-weight: 700;
+    cursor: pointer;
   }
   .badge {
     font-size: 11px;
@@ -415,6 +416,107 @@
     width: 14px;
     height: 14px;
   }
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .detail-overlay.hidden { display: none; }
+  .detail-sheet {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 32px;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4);
+  }
+  .detail-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    appearance: none;
+    border: none;
+    background: #2e2430;
+    color: var(--text);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .detail-bar-name {
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 32px 6px 0;
+  }
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-bottom: 16px;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .detail-action-btn {
+    flex: 1;
+    appearance: none;
+    border: 1px solid var(--magenta);
+    background: rgba(186, 25, 113, 0.12);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 11px 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .menu-section {
+    margin-bottom: 22px;
+  }
+  .menu-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--accent);
+  }
+  .menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .menu-empty {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 10px 0;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #1c1c1e;
+    border: 1px solid #2e2430;
+    border-radius: 10px;
+  }
+  .menu-item-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -460,6 +562,32 @@
   <div class="count" id="count"></div>
   <div id="list"></div>
 </main>
+
+<div id="barDetail" class="detail-overlay hidden">
+  <div class="detail-sheet">
+    <button class="detail-close" id="detailClose" aria-label="Fechar">✕</button>
+    <h2 class="detail-bar-name" id="detailBarName"></h2>
+    <div class="detail-meta" id="detailMeta"></div>
+    <div class="detail-actions">
+      <button class="detail-action-btn" id="detailReservarBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Reservar
+      </button>
+      <button class="detail-action-btn" id="detailOfertaBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1a2 2 0 0 0 0 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 0 0-4z"/><line x1="9" y1="7" x2="9" y2="17"/></svg>
+        Oferta
+      </button>
+    </div>
+    <div class="menu-section">
+      <h3 class="menu-title">Drinks Clássicos</h3>
+      <div class="menu-list" id="menuClassicos"></div>
+    </div>
+    <div class="menu-section">
+      <h3 class="menu-title">Drinks Autorais</h3>
+      <div class="menu-list" id="menuAutorais"></div>
+    </div>
+  </div>
+</div>
 
 <script src="data.js"></script>
 <script type="module">
@@ -545,6 +673,7 @@
         favoritos: [...favoritos],
         visitados: [...visitados],
         embreve: [...embreve],
+        drinkFavoritos: [...drinkFavoritos],
         updatedAt: Date.now()
       });
     } catch (err) {
@@ -560,9 +689,11 @@
         favoritos = new Set(cloudData.favoritos || []);
         visitados = new Set(cloudData.visitados || []);
         embreve = new Set(cloudData.embreve || []);
+        drinkFavoritos = new Set(cloudData.drinkFavoritos || []);
         saveFavoritos();
         saveVisitados();
         saveEmbreve();
+        saveDrinkFavoritos();
       } else {
         await syncToCloud();
       }
@@ -692,6 +823,101 @@
 
   const igIconSvg = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>`;
 
+  const DRINK_FAV_KEY = 'garimpa_drink_favoritos';
+  const drinkFavStored = localStorage.getItem(DRINK_FAV_KEY);
+  let drinkFavoritos = new Set(drinkFavStored ? JSON.parse(drinkFavStored) : []);
+
+  function saveDrinkFavoritos() {
+    localStorage.setItem(DRINK_FAV_KEY, JSON.stringify([...drinkFavoritos]));
+  }
+
+  function toggleDrinkFavorito(key) {
+    if (drinkFavoritos.has(key)) drinkFavoritos.delete(key);
+    else drinkFavoritos.add(key);
+    saveDrinkFavoritos();
+    if (window.syncToCloud) window.syncToCloud();
+    renderMenuLists();
+  }
+
+  const barDetail = document.getElementById('barDetail');
+  const detailClose = document.getElementById('detailClose');
+  const detailBarName = document.getElementById('detailBarName');
+  const detailMeta = document.getElementById('detailMeta');
+  const detailReservarBtn = document.getElementById('detailReservarBtn');
+  const detailOfertaBtn = document.getElementById('detailOfertaBtn');
+  const menuClassicos = document.getElementById('menuClassicos');
+  const menuAutorais = document.getElementById('menuAutorais');
+  let detailBar = null;
+
+  function renderDrinkList(container, drinks, barId, categoria) {
+    if (!drinks || drinks.length === 0) {
+      container.innerHTML = '<div class="menu-empty">Em breve.</div>';
+      return;
+    }
+    container.innerHTML = drinks.map((nome, i) => {
+      const key = `${barId}__${categoria}__${i}`;
+      const isFav = drinkFavoritos.has(key);
+      return `
+        <div class="menu-item">
+          <span class="menu-item-name">${escapeHtml(nome)}</span>
+          <button class="heart-btn ${isFav ? 'fav' : ''}" data-drink-key="${key}" aria-label="Favoritar drink">${isFav ? '♥' : '♡'}</button>
+        </div>
+      `;
+    }).join('');
+    container.querySelectorAll('[data-drink-key]').forEach(btn => {
+      btn.addEventListener('click', () => toggleDrinkFavorito(btn.dataset.drinkKey));
+    });
+  }
+
+  function renderMenuLists() {
+    if (!detailBar) return;
+    renderDrinkList(menuClassicos, detailBar.drinksClassicos, detailBar._id, 'classicos');
+    renderDrinkList(menuAutorais, detailBar.drinksAutorais, detailBar._id, 'autorais');
+  }
+
+  function openBarDetail(id) {
+    const b = data.find(item => item._id === id);
+    if (!b) return;
+    detailBar = b;
+    detailBarName.textContent = b.bar;
+    detailMeta.innerHTML = `
+      ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
+      ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
+    `;
+    detailMeta.querySelectorAll('[data-action="estilo"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        estiloFilter.value = btn.dataset.estilo;
+        closeBarDetail();
+        render();
+      });
+    });
+    detailMeta.querySelectorAll('[data-action="bairro"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bairroFilter.value = btn.dataset.bairro;
+        closeBarDetail();
+        render();
+      });
+    });
+    renderMenuLists();
+    barDetail.classList.remove('hidden');
+  }
+
+  function closeBarDetail() {
+    barDetail.classList.add('hidden');
+    detailBar = null;
+  }
+
+  detailClose.addEventListener('click', closeBarDetail);
+  barDetail.addEventListener('click', (e) => {
+    if (e.target === barDetail) closeBarDetail();
+  });
+  detailReservarBtn.addEventListener('click', () => {
+    alert('Em breve você poderá reservar direto pelo app.');
+  });
+  detailOfertaBtn.addEventListener('click', () => {
+    alert('Em breve as ofertas deste bar aparecerão aqui.');
+  });
+
   function uniqueSorted(field) {
     return [...new Set(data.map(b => b[field]).filter(v => v && v.trim() !== ''))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   }
@@ -750,7 +976,7 @@
     listEl.innerHTML = filtered.map(b => `
       <div class="card">
         <div class="card-top">
-          <div class="bar-name">${escapeHtml(b.bar)}</div>
+          <div class="bar-name" data-action="detail" data-id="${b._id}">${escapeHtml(b.bar)}</div>
           <div class="card-top-right">
             ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener" aria-label="Ver Instagram">${igIconSvg}</a>` : ''}
             <button class="pin-btn ${visitados.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="visit" aria-label="Marcar como visitado" title="Visitados: marque os bares que você já foi">
@@ -789,6 +1015,9 @@
     });
     listEl.querySelectorAll('[data-action="visit"]').forEach(btn => {
       btn.addEventListener('click', () => toggleVisitado(Number(btn.dataset.id)));
+    });
+    listEl.querySelectorAll('[data-action="detail"]').forEach(btn => {
+      btn.addEventListener('click', () => openBarDetail(Number(btn.dataset.id)));
     });
   }
 
