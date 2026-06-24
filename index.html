@@ -16,7 +16,7 @@
     --indigo: #241A8C;
     --rust: #9C4A1E;
     --bg: #15101a;
-    --card: #1f1722;
+    --card: #1c1c1e;
     --accent: var(--pink);
     --text: #f5eef2;
     --muted: #ab93a5;
@@ -32,7 +32,7 @@
     padding-bottom: 40px;
   }
   header {
-    padding: 20px 16px 12px;
+    padding: 36px 16px 16px;
     position: sticky;
     top: 0;
     background: var(--bg);
@@ -41,9 +41,12 @@
   }
   .brand {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    text-align: center;
   }
   .logo-mark {
     width: 34px;
@@ -93,8 +96,9 @@
   .subtitle {
     font-size: 13px;
     color: var(--muted);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     line-height: 1.5;
+    text-align: center;
   }
   .subtitle a {
     color: var(--accent);
@@ -109,7 +113,7 @@
     padding: 12px 14px;
     border-radius: 10px;
     border: 1px solid #3a2e38;
-    background: #1f1722;
+    background: #1c1c1e;
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
@@ -129,7 +133,7 @@
     padding: 8px 10px;
     border-radius: 8px;
     border: 1px solid #3a2e38;
-    background: #1f1722;
+    background: #1c1c1e;
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 13px;
@@ -149,7 +153,7 @@
     font-weight: 600;
     color: var(--muted);
     cursor: pointer;
-    background: #1f1722;
+    background: #1c1c1e;
   }
   .toggle-btn.active {
     border-color: var(--magenta);
@@ -288,6 +292,7 @@
     padding: 24px;
   }
   #gate.hidden { display: none; }
+  .gate-box.hidden { display: none; }
   .gate-box {
     width: 100%;
     max-width: 320px;
@@ -315,7 +320,7 @@
     padding: 12px 14px;
     border-radius: 10px;
     border: 1px solid #3a2e38;
-    background: #1f1722;
+    background: #1c1c1e;
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
@@ -341,11 +346,75 @@
     margin-top: 10px;
     min-height: 16px;
   }
+  header { position: relative; }
+  .account-bar {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 20;
+  }
+  .account-greeting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .account-greeting-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .account-bar .account-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #3a2e38;
+    cursor: pointer;
+    display: block;
+  }
+  .account-menu {
+    position: absolute;
+    top: 42px;
+    right: 0;
+    background: #1c1c1e;
+    border: 1px solid #3a2e38;
+    border-radius: 10px;
+    padding: 10px;
+    min-width: 160px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    text-align: right;
+  }
+  .account-menu.open { display: flex; }
+  .account-menu .account-name {
+    font-size: 12.5px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .account-menu button {
+    appearance: none;
+    border: 1px solid #3a2e38;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+  .google-g {
+    width: 14px;
+    height: 14px;
+  }
 </style>
 </head>
 <body>
 <div id="gate">
-  <div class="gate-box">
+  <div class="gate-box" id="passwordStep">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h2>Garimpa Drink</h2>
     <p>Acesso restrito. Digite a senha para entrar.</p>
@@ -353,6 +422,13 @@
       <input type="password" id="gatePassword" placeholder="Senha" autocomplete="current-password">
       <button type="submit">Entrar</button>
     </form>
+    <div class="gate-error" id="passwordError"></div>
+  </div>
+  <div class="gate-box hidden" id="googleStep">
+    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <h2>Garimpa Drink</h2>
+    <p>Entre com sua conta Google para acessar.</p>
+    <button id="gateGoogleBtn" type="button"></button>
     <div class="gate-error" id="gateError"></div>
   </div>
 </div>
@@ -362,6 +438,7 @@
     <h1>Garimpa Drink</h1>
   </div>
   <div class="subtitle">O básico para você beber além do básico em São Paulo.<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <div class="account-bar" id="accountBar"></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -380,26 +457,163 @@
 </main>
 
 <script src="data.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwtWbRTRVkTL31ZJuh60UFRS4CIny4o3U",
+    authDomain: "garimpa-drink.firebaseapp.com",
+    projectId: "garimpa-drink",
+    storageBucket: "garimpa-drink.firebasestorage.app",
+    messagingSenderId: "769200848296",
+    appId: "1:769200848296:web:d628cb9dcf42f286f4319d",
+    measurementId: "G-YZB3R86M9Y"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  const db = getFirestore(firebaseApp);
+  const googleProvider = new GoogleAuthProvider();
+  let currentUser = null;
+
+  const accountBar = document.getElementById('accountBar');
+  const gateEl = document.getElementById('gate');
+  const gateGoogleBtn = document.getElementById('gateGoogleBtn');
+  const gateError = document.getElementById('gateError');
+  const googleIconSvg = `<svg class="google-g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-2 14-5.3l-6.5-5.4C29.6 35 26.9 36 24 36c-5.3 0-9.6-3.4-11.3-8.1l-6.6 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.5 5.4C40.9 36.2 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>`;
+
+  gateGoogleBtn.innerHTML = `${googleIconSvg} Entrar com Google`;
+  gateGoogleBtn.addEventListener('click', () => {
+    gateError.textContent = '';
+    signInWithPopup(auth, googleProvider).catch((err) => {
+      console.error(err);
+      gateError.textContent = 'Não foi possível entrar com Google. Tente novamente.';
+    });
+  });
+
+  function renderAccountBar() {
+    if (currentUser) {
+      gateEl.classList.add('hidden');
+      const firstName = (currentUser.displayName || currentUser.email || '').trim().split(' ')[0];
+      accountBar.innerHTML = `
+        <div class="account-greeting" id="greetingBtn">
+          <span class="account-greeting-text">Olá, ${firstName}!</span>
+          <img class="account-avatar" id="avatarBtn" src="${currentUser.photoURL || ''}" referrerpolicy="no-referrer">
+        </div>
+        <div class="account-menu" id="accountMenu">
+          <span class="account-name">${currentUser.displayName || currentUser.email}</span>
+          <button id="logoutBtn">Sair</button>
+        </div>
+      `;
+      const accountMenu = document.getElementById('accountMenu');
+      document.getElementById('greetingBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        accountMenu.classList.toggle('open');
+      });
+      document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+      document.addEventListener('click', () => accountMenu.classList.remove('open'), { once: true });
+    } else {
+      accountBar.innerHTML = '';
+      if (window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok') {
+        gateEl.classList.add('hidden');
+        return;
+      }
+      gateEl.classList.remove('hidden');
+      if (localStorage.getItem('garimpa_acesso') === 'ok') {
+        document.getElementById('passwordStep').classList.add('hidden');
+        document.getElementById('googleStep').classList.remove('hidden');
+      }
+    }
+  }
+
+  async function syncToCloud() {
+    if (!currentUser) return;
+    try {
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        favoritos: [...favoritos],
+        visitados: [...visitados],
+        embreve: [...embreve],
+        updatedAt: Date.now()
+      });
+    } catch (err) {
+      console.error('Erro ao sincronizar com a nuvem', err);
+    }
+  }
+
+  async function loadFromCloud(uid) {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) {
+        const cloudData = snap.data();
+        favoritos = new Set(cloudData.favoritos || []);
+        visitados = new Set(cloudData.visitados || []);
+        embreve = new Set(cloudData.embreve || []);
+        saveFavoritos();
+        saveVisitados();
+        saveEmbreve();
+      } else {
+        await syncToCloud();
+      }
+    } catch (err) {
+      console.error('Erro ao carregar dados da nuvem', err);
+    }
+    render();
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    renderAccountBar();
+    if (user) {
+      await loadFromCloud(user.uid);
+    }
+  });
+
+  renderAccountBar();
+  window.syncToCloud = syncToCloud;
+</script>
 <script>
   const GATE_KEY = 'garimpa_acesso';
   const GATE_PASSWORD = 'penicilinbrasil';
+  const BYPASS_KEY = 'garimpa_bypass';
+  const BYPASS_PASSWORD = 'penicilinbrasil13';
   const gateEl = document.getElementById('gate');
+  const passwordStep = document.getElementById('passwordStep');
+  const googleStep = document.getElementById('googleStep');
   const gateForm = document.getElementById('gateForm');
   const gatePassword = document.getElementById('gatePassword');
-  const gateError = document.getElementById('gateError');
+  const passwordError = document.getElementById('passwordError');
 
-  if (localStorage.getItem(GATE_KEY) === 'ok') {
+  function showGoogleStep() {
+    passwordStep.classList.add('hidden');
+    googleStep.classList.remove('hidden');
+  }
+
+  function grantBypass() {
+    localStorage.setItem(BYPASS_KEY, 'ok');
+    window.garimpaBypass = true;
     gateEl.classList.add('hidden');
+  }
+
+  if (localStorage.getItem(BYPASS_KEY) === 'ok') {
+    window.garimpaBypass = true;
+    gateEl.classList.add('hidden');
+  } else if (localStorage.getItem(GATE_KEY) === 'ok') {
+    showGoogleStep();
   }
 
   gateForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (gatePassword.value === GATE_PASSWORD) {
+    if (gatePassword.value === BYPASS_PASSWORD) {
+      passwordError.textContent = '';
+      grantBypass();
+    } else if (gatePassword.value === GATE_PASSWORD) {
       localStorage.setItem(GATE_KEY, 'ok');
-      gateEl.classList.add('hidden');
-      gateError.textContent = '';
+      passwordError.textContent = '';
+      showGoogleStep();
     } else {
-      gateError.textContent = 'Senha incorreta. Tente novamente.';
+      passwordError.textContent = 'Senha incorreta. Tente novamente.';
       gatePassword.value = '';
       gatePassword.focus();
     }
@@ -427,6 +641,7 @@
     if (favoritos.has(id)) favoritos.delete(id);
     else favoritos.add(id);
     saveFavoritos();
+    if (window.syncToCloud) window.syncToCloud();
     render();
   }
 
@@ -442,6 +657,7 @@
     if (embreve.has(id)) embreve.delete(id);
     else embreve.add(id);
     saveEmbreve();
+    if (window.syncToCloud) window.syncToCloud();
     render();
   }
 
@@ -457,6 +673,7 @@
     if (visitados.has(id)) visitados.delete(id);
     else visitados.add(id);
     saveVisitados();
+    if (window.syncToCloud) window.syncToCloud();
     render();
   }
 
@@ -502,12 +719,14 @@
       return true;
     });
 
+    filtered.sort((a, b) => a.bar.localeCompare(b.bar, 'pt-BR'));
+
     let labelExtra;
     if (visitedMode === 'favorites') labelExtra = ` — ♥ ${favoritos.size} favorito(s)`;
     else if (visitedMode === 'visited') labelExtra = ` — visitados: ${visitados.size} de ${data.length}`;
     else if (visitedMode === 'embreve') labelExtra = ` — 🔖 ${embreve.size} ir em breve`;
     else labelExtra = ` — visitados: ${visitados.size} de ${data.length}`;
-    countEl.textContent = `${filtered.length} resultado(s)${labelExtra}`;
+    countEl.textContent = `${filtered.length} resultado(s)${labelExtra} — Listados em ordem alfabética.`;
 
     if (filtered.length === 0) {
       let emptyMsg = 'Nenhum bar encontrado 🙁';
@@ -524,13 +743,13 @@
           <div class="bar-name">${escapeHtml(b.bar)}</div>
           <div class="card-top-right">
             ${b.instagram ? `<a class="ig-link" href="${escapeHtml(b.instagram)}" target="_blank" rel="noopener" aria-label="Ver Instagram">${igIconSvg}</a>` : ''}
-            <button class="pin-btn ${visitados.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="visit" aria-label="Marcar como visitado">
+            <button class="pin-btn ${visitados.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="visit" aria-label="Marcar como visitado" title="Visitados: marque os bares que você já foi">
               ${pinIconSvg}
             </button>
-            <button class="bookmark-btn ${embreve.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="embreve" aria-label="Marcar como ir em breve">
+            <button class="bookmark-btn ${embreve.has(b._id) ? 'active' : ''}" data-id="${b._id}" data-action="embreve" aria-label="Marcar como ir em breve" title="Ir em Breve: marque os bares que você quer visitar">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${bookmarkIconPath}"/></svg>
             </button>
-            <button class="heart-btn ${favoritos.has(b._id) ? 'fav' : ''}" data-id="${b._id}" data-action="fav" aria-label="Favoritar">${favoritos.has(b._id) ? '♥' : '♡'}</button>
+            <button class="heart-btn ${favoritos.has(b._id) ? 'fav' : ''}" data-id="${b._id}" data-action="fav" aria-label="Favoritar" title="Favoritos: marque seus bares preferidos">${favoritos.has(b._id) ? '♥' : '♡'}</button>
           </div>
         </div>
         <div class="meta">
