@@ -912,27 +912,38 @@
       passwordSetError.textContent = 'As senhas não coincidem.';
       return;
     }
+    if (!auth.currentUser) {
+      passwordSetError.textContent = 'Sessão de confirmação expirou. Volte e clique no link do email novamente.';
+      return;
+    }
     passwordSetError.textContent = 'Salvando...';
     try {
       await updatePassword(auth.currentUser, pass);
-      const pendingRaw = localStorage.getItem(PENDING_KEY);
-      const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
-      const email = pendingAuthEmail || (pending && pending.email);
-      const nome = (pending && pending.nome) || '';
-      currentReg = { nome, email, maior18: true };
-      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
-      localStorage.removeItem(PENDING_KEY);
+    } catch (err) {
+      console.error('Erro ao criar senha (updatePassword)', err);
+      passwordSetError.textContent = `Erro ao criar senha (${err.code || err.message}). Tente novamente.`;
+      return;
+    }
+    const pendingRaw = localStorage.getItem(PENDING_KEY);
+    const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
+    const email = pendingAuthEmail || (pending && pending.email) || auth.currentUser.email;
+    const nome = (pending && pending.nome) || '';
+    currentReg = { nome, email, maior18: true };
+    localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+    localStorage.removeItem(PENDING_KEY);
+    try {
       await setDoc(doc(db, 'users', email), {
         nome, email, maior18: true, emailVerified: true, updatedAt: Date.now()
       }, { merge: true });
-      cadastroOverlay.classList.add('hidden');
-      renderAccountBar();
-      window.trackEvent('cadastro_concluido');
-      await loadFromCloud(email);
     } catch (err) {
-      console.error('Erro ao criar senha', err);
-      passwordSetError.textContent = 'Erro ao criar senha. Tente novamente.';
+      console.error('Erro ao salvar cadastro (setDoc)', err);
+      passwordSetError.textContent = `Senha criada, mas houve um erro ao salvar o cadastro (${err.code || err.message}).`;
+      return;
     }
+    cadastroOverlay.classList.add('hidden');
+    renderAccountBar();
+    window.trackEvent('cadastro_concluido');
+    await loadFromCloud(email);
   });
 
   async function handleEmailLinkSignIn() {
