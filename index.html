@@ -607,11 +607,26 @@
         <button type="submit">Continuar</button>
       </form>
       <div class="gate-error" id="cadastroError"></div>
-      <p class="cadastro-switch">Já tem cadastro? <a href="#" id="showLoginLink">Entrar com seu email</a></p>
+      <p class="cadastro-switch">Já tem cadastro? <a href="#" id="showLoginLink">Entrar com email e senha</a></p>
+    </div>
+    <div id="cadastroCheckEmailBlock" class="hidden">
+      <p id="cadastroCheckEmailText">Enviamos um link de confirmação para o seu email. Abra-o e clique no link para continuar.</p>
+      <div class="gate-error" id="checkEmailError"></div>
+      <p class="cadastro-switch"><a href="#" id="backToCadastroFromCheck">Voltar</a></p>
+    </div>
+    <div id="cadastroPasswordBlock" class="hidden">
+      <p>Email confirmado! Agora crie uma senha de acesso.</p>
+      <form id="passwordSetForm">
+        <input type="password" id="newPassword" placeholder="Nova senha" autocomplete="new-password">
+        <input type="password" id="newPasswordConfirm" placeholder="Confirme a senha" autocomplete="new-password">
+        <button type="submit">Criar senha</button>
+      </form>
+      <div class="gate-error" id="passwordSetError"></div>
     </div>
     <div id="cadastroLoginBlock" class="hidden">
       <form id="loginForm">
         <input type="email" id="loginEmail" placeholder="Seu email" autocomplete="email">
+        <input type="password" id="loginPassword" placeholder="Sua senha" autocomplete="current-password">
         <button type="submit">Entrar</button>
       </form>
       <div class="gate-error" id="loginError"></div>
@@ -674,6 +689,10 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+  import {
+    getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
+    updatePassword, signInWithEmailAndPassword, signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAwtWbRTRVkTL31ZJuh60UFRS4CIny4o3U",
@@ -688,6 +707,11 @@
   const firebaseApp = initializeApp(firebaseConfig);
   const db = getFirestore(firebaseApp);
   const analytics = getAnalytics(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  const actionCodeSettings = {
+    url: window.location.origin + window.location.pathname,
+    handleCodeInApp: true,
+  };
 
   window.trackEvent = function (eventName, params) {
     try {
@@ -698,6 +722,8 @@
   };
 
   const REG_KEY = 'garimpa_cadastro';
+  const PENDING_KEY = 'garimpa_pendente_cadastro';
+  const EMAIL_FOR_SIGNIN_KEY = 'garimpa_email_signin';
   const accountBar = document.getElementById('accountBar');
   const interactionLock = document.getElementById('interactionLock');
   const cadastroOverlay = document.getElementById('cadastroOverlay');
@@ -708,12 +734,23 @@
   const cadastroError = document.getElementById('cadastroError');
   const cadastroClose = document.getElementById('cadastroClose');
   const cadastroRegisterBlock = document.getElementById('cadastroRegisterBlock');
+  const cadastroCheckEmailBlock = document.getElementById('cadastroCheckEmailBlock');
+  const cadastroCheckEmailText = document.getElementById('cadastroCheckEmailText');
+  const checkEmailError = document.getElementById('checkEmailError');
+  const backToCadastroFromCheck = document.getElementById('backToCadastroFromCheck');
+  const cadastroPasswordBlock = document.getElementById('cadastroPasswordBlock');
+  const passwordSetForm = document.getElementById('passwordSetForm');
+  const newPassword = document.getElementById('newPassword');
+  const newPasswordConfirm = document.getElementById('newPasswordConfirm');
+  const passwordSetError = document.getElementById('passwordSetError');
   const cadastroLoginBlock = document.getElementById('cadastroLoginBlock');
   const showLoginLink = document.getElementById('showLoginLink');
   const showCadastroLink = document.getElementById('showCadastroLink');
   const loginForm = document.getElementById('loginForm');
   const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
   const loginError = document.getElementById('loginError');
+  let pendingAuthEmail = null;
 
   function hasBypass() {
     return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
@@ -752,6 +789,7 @@
         window.trackEvent('logout');
         localStorage.removeItem(REG_KEY);
         currentReg = null;
+        signOut(auth).catch((err) => console.error('Erro ao sair', err));
         renderAccountBar();
       });
       document.addEventListener('click', () => accountMenu.classList.remove('open'), { once: true });
@@ -761,53 +799,65 @@
     }
   }
 
-  function showCadastroBlock() {
-    cadastroLoginBlock.classList.add('hidden');
-    cadastroRegisterBlock.classList.remove('hidden');
+  const cadastroBlocks = {
+    register: cadastroRegisterBlock,
+    checkEmail: cadastroCheckEmailBlock,
+    password: cadastroPasswordBlock,
+    login: cadastroLoginBlock,
+  };
+
+  function showBlock(name) {
+    for (const key in cadastroBlocks) {
+      cadastroBlocks[key].classList.toggle('hidden', key !== name);
+    }
     cadastroError.textContent = '';
+    checkEmailError.textContent = '';
+    passwordSetError.textContent = '';
     loginError.textContent = '';
   }
 
   interactionLock.addEventListener('click', () => {
-    showCadastroBlock();
+    showBlock('register');
     cadastroOverlay.classList.remove('hidden');
   });
 
   cadastroClose.addEventListener('click', () => {
     cadastroOverlay.classList.add('hidden');
-    cadastroError.textContent = '';
-    loginError.textContent = '';
   });
 
   showLoginLink.addEventListener('click', (e) => {
     e.preventDefault();
-    cadastroRegisterBlock.classList.add('hidden');
-    cadastroLoginBlock.classList.remove('hidden');
-    cadastroError.textContent = '';
-    loginError.textContent = '';
+    showBlock('login');
   });
 
   showCadastroLink.addEventListener('click', (e) => {
     e.preventDefault();
-    showCadastroBlock();
+    showBlock('register');
+  });
+
+  backToCadastroFromCheck.addEventListener('click', (e) => {
+    e.preventDefault();
+    showBlock('register');
   });
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = loginEmail.value.trim().toLowerCase();
+    const password = loginPassword.value;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       loginError.textContent = 'Email inválido.';
       return;
     }
+    if (!password) {
+      loginError.textContent = 'Digite sua senha.';
+      return;
+    }
     loginError.textContent = 'Entrando...';
     try {
+      await signInWithEmailAndPassword(auth, email, password);
       const snap = await getDoc(doc(db, 'users', email));
-      if (!snap.exists()) {
-        loginError.textContent = 'Email não encontrado. Faça o cadastro.';
-        return;
-      }
-      const data = snap.data();
-      currentReg = { nome: data.nome || '', email, maior18: true };
+      const nome = snap.exists() ? (snap.data().nome || '') : '';
+      currentReg = { nome, email, maior18: true };
       localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
       cadastroOverlay.classList.add('hidden');
       renderAccountBar();
@@ -815,7 +865,7 @@
       await loadFromCloud(email);
     } catch (err) {
       console.error('Erro ao entrar', err);
-      loginError.textContent = 'Erro ao entrar. Tente novamente.';
+      loginError.textContent = 'Email ou senha incorretos.';
     }
   });
 
@@ -836,21 +886,76 @@
       cadastroError.textContent = 'É preciso declarar que é maior de 18 anos.';
       return;
     }
-    cadastroError.textContent = 'Salvando...';
-    currentReg = { nome, email, maior18: true };
-    localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+    cadastroError.textContent = 'Enviando link de confirmação...';
     try {
-      await setDoc(doc(db, 'users', email), {
-        nome, email, maior18: true, updatedAt: Date.now()
-      }, { merge: true });
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      localStorage.setItem(PENDING_KEY, JSON.stringify({ nome, email, maior18: true }));
+      localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
+      cadastroCheckEmailText.textContent = `Enviamos um link de confirmação para ${email}. Abra-o e clique no link para continuar.`;
+      showBlock('checkEmail');
+      window.trackEvent('cadastro_link_enviado');
     } catch (err) {
-      console.error('Erro ao salvar cadastro', err);
+      console.error('Erro ao enviar link de confirmação', err);
+      cadastroError.textContent = 'Não foi possível enviar o email. Tente novamente.';
     }
-    cadastroOverlay.classList.add('hidden');
-    renderAccountBar();
-    window.trackEvent('cadastro');
-    await loadFromCloud(email);
   });
+
+  passwordSetForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pass = newPassword.value;
+    const pass2 = newPasswordConfirm.value;
+    if (!pass || pass.length < 6) {
+      passwordSetError.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      return;
+    }
+    if (pass !== pass2) {
+      passwordSetError.textContent = 'As senhas não coincidem.';
+      return;
+    }
+    passwordSetError.textContent = 'Salvando...';
+    try {
+      await updatePassword(auth.currentUser, pass);
+      const pendingRaw = localStorage.getItem(PENDING_KEY);
+      const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
+      const email = pendingAuthEmail || (pending && pending.email);
+      const nome = (pending && pending.nome) || '';
+      currentReg = { nome, email, maior18: true };
+      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+      localStorage.removeItem(PENDING_KEY);
+      await setDoc(doc(db, 'users', email), {
+        nome, email, maior18: true, emailVerified: true, updatedAt: Date.now()
+      }, { merge: true });
+      cadastroOverlay.classList.add('hidden');
+      renderAccountBar();
+      window.trackEvent('cadastro_concluido');
+      await loadFromCloud(email);
+    } catch (err) {
+      console.error('Erro ao criar senha', err);
+      passwordSetError.textContent = 'Erro ao criar senha. Tente novamente.';
+    }
+  });
+
+  async function handleEmailLinkSignIn() {
+    if (!isSignInWithEmailLink(auth, window.location.href)) return;
+    let email = localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
+    if (!email) {
+      email = window.prompt('Confirme seu email para continuar:');
+    }
+    if (!email) return;
+    try {
+      await signInWithEmailLink(auth, email, window.location.href);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
+      pendingAuthEmail = email;
+      showBlock('password');
+      cadastroOverlay.classList.remove('hidden');
+    } catch (err) {
+      console.error('Erro ao confirmar email', err);
+      checkEmailError.textContent = 'Link inválido ou expirado. Faça o cadastro novamente.';
+      showBlock('checkEmail');
+      cadastroOverlay.classList.remove('hidden');
+    }
+  }
 
   async function syncToCloud() {
     if (!currentReg) return;
@@ -893,6 +998,7 @@
   if (currentReg) {
     loadFromCloud(currentReg.email);
   }
+  handleEmailLinkSignIn();
   window.syncToCloud = syncToCloud;
 </script>
 <script>
