@@ -615,7 +615,7 @@
       <p class="cadastro-switch"><a href="#" id="backToCadastroFromCheck">Voltar</a></p>
     </div>
     <div id="cadastroPasswordBlock" class="hidden">
-      <p>Email confirmado! Agora crie uma senha de acesso.</p>
+      <p id="passwordSetIntro">Email confirmado! Agora crie uma senha de acesso.</p>
       <form id="passwordSetForm">
         <input type="password" id="newPassword" placeholder="Nova senha" autocomplete="new-password">
         <input type="password" id="newPasswordConfirm" placeholder="Confirme a senha" autocomplete="new-password">
@@ -630,7 +630,17 @@
         <button type="submit">Entrar</button>
       </form>
       <div class="gate-error" id="loginError"></div>
+      <p class="cadastro-switch"><a href="#" id="showForgotLink">Esqueceu a senha?</a></p>
       <p class="cadastro-switch"><a href="#" id="showCadastroLink">Voltar para cadastro</a></p>
+    </div>
+    <div id="cadastroForgotBlock" class="hidden">
+      <p>Informe seu email para receber um link de redefinição de senha.</p>
+      <form id="forgotForm">
+        <input type="email" id="forgotEmail" placeholder="Seu email" autocomplete="email">
+        <button type="submit">Enviar link</button>
+      </form>
+      <div class="gate-error" id="forgotError"></div>
+      <p class="cadastro-switch"><a href="#" id="backToLoginFromForgot">Voltar</a></p>
     </div>
   </div>
 </div>
@@ -691,7 +701,8 @@
   import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
   import {
     getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
-    updatePassword, signInWithEmailAndPassword, signOut
+    updatePassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
+    verifyPasswordResetCode, confirmPasswordReset
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -739,6 +750,7 @@
   const checkEmailError = document.getElementById('checkEmailError');
   const backToCadastroFromCheck = document.getElementById('backToCadastroFromCheck');
   const cadastroPasswordBlock = document.getElementById('cadastroPasswordBlock');
+  const passwordSetIntro = document.getElementById('passwordSetIntro');
   const passwordSetForm = document.getElementById('passwordSetForm');
   const newPassword = document.getElementById('newPassword');
   const newPasswordConfirm = document.getElementById('newPasswordConfirm');
@@ -750,7 +762,14 @@
   const loginEmail = document.getElementById('loginEmail');
   const loginPassword = document.getElementById('loginPassword');
   const loginError = document.getElementById('loginError');
+  const showForgotLink = document.getElementById('showForgotLink');
+  const cadastroForgotBlock = document.getElementById('cadastroForgotBlock');
+  const forgotForm = document.getElementById('forgotForm');
+  const forgotEmail = document.getElementById('forgotEmail');
+  const forgotError = document.getElementById('forgotError');
+  const backToLoginFromForgot = document.getElementById('backToLoginFromForgot');
   let pendingAuthEmail = null;
+  let resetOobCode = null;
 
   function hasBypass() {
     return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
@@ -804,6 +823,7 @@
     checkEmail: cadastroCheckEmailBlock,
     password: cadastroPasswordBlock,
     login: cadastroLoginBlock,
+    forgot: cadastroForgotBlock,
   };
 
   function showBlock(name) {
@@ -814,6 +834,7 @@
     checkEmailError.textContent = '';
     passwordSetError.textContent = '';
     loginError.textContent = '';
+    forgotError.textContent = '';
   }
 
   interactionLock.addEventListener('click', () => {
@@ -833,6 +854,17 @@
   showCadastroLink.addEventListener('click', (e) => {
     e.preventDefault();
     showBlock('register');
+  });
+
+  showForgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    forgotEmail.value = loginEmail.value.trim();
+    showBlock('forgot');
+  });
+
+  backToLoginFromForgot.addEventListener('click', (e) => {
+    e.preventDefault();
+    showBlock('login');
   });
 
   backToCadastroFromCheck.addEventListener('click', (e) => {
@@ -866,6 +898,24 @@
     } catch (err) {
       console.error('Erro ao entrar', err);
       loginError.textContent = 'Email ou senha incorretos.';
+    }
+  });
+
+  forgotForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = forgotEmail.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      forgotError.textContent = 'Email inválido.';
+      return;
+    }
+    forgotError.textContent = 'Enviando...';
+    try {
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      forgotError.textContent = `Enviamos um link de redefinição de senha para ${email}. Confira sua caixa de entrada.`;
+      window.trackEvent('senha_esquecida_link_enviado');
+    } catch (err) {
+      console.error('Erro ao enviar link de redefinição', err);
+      forgotError.textContent = `Não foi possível enviar o email (${err.code || err.message}). Tente novamente.`;
     }
   });
 
@@ -910,6 +960,33 @@
     }
     if (pass !== pass2) {
       passwordSetError.textContent = 'As senhas não coincidem.';
+      return;
+    }
+    if (resetOobCode) {
+      passwordSetError.textContent = 'Salvando...';
+      const oobCode = resetOobCode;
+      const email = pendingAuthEmail;
+      try {
+        await confirmPasswordReset(auth, oobCode, pass);
+      } catch (err) {
+        console.error('Erro ao redefinir senha (confirmPasswordReset)', err);
+        passwordSetError.textContent = `Erro ao redefinir senha (${err.code || err.message}). Tente novamente.`;
+        return;
+      }
+      resetOobCode = null;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        console.error('Erro ao entrar após redefinir senha', err);
+      }
+      const snap = await getDoc(doc(db, 'users', email)).catch(() => null);
+      const nome = snap && snap.exists() ? (snap.data().nome || '') : '';
+      currentReg = { nome, email, maior18: true };
+      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+      cadastroOverlay.classList.add('hidden');
+      renderAccountBar();
+      window.trackEvent('senha_redefinida');
+      await loadFromCloud(email);
       return;
     }
     if (!auth.currentUser) {
@@ -958,12 +1035,34 @@
       window.history.replaceState({}, document.title, window.location.pathname);
       localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
       pendingAuthEmail = email;
+      passwordSetIntro.textContent = 'Email confirmado! Agora crie uma senha de acesso.';
       showBlock('password');
       cadastroOverlay.classList.remove('hidden');
     } catch (err) {
       console.error('Erro ao confirmar email', err);
       checkEmailError.textContent = 'Link inválido ou expirado. Faça o cadastro novamente.';
       showBlock('checkEmail');
+      cadastroOverlay.classList.remove('hidden');
+    }
+  }
+
+  async function handlePasswordResetLink() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') !== 'resetPassword') return;
+    const oobCode = params.get('oobCode');
+    if (!oobCode) return;
+    window.history.replaceState({}, document.title, window.location.pathname);
+    try {
+      const email = await verifyPasswordResetCode(auth, oobCode);
+      resetOobCode = oobCode;
+      pendingAuthEmail = email;
+      passwordSetIntro.textContent = 'Link confirmado! Defina sua nova senha.';
+      showBlock('password');
+      cadastroOverlay.classList.remove('hidden');
+    } catch (err) {
+      console.error('Erro ao verificar link de redefinição', err);
+      loginError.textContent = 'Link inválido ou expirado. Solicite a redefinição novamente.';
+      showBlock('login');
       cadastroOverlay.classList.remove('hidden');
     }
   }
@@ -1010,6 +1109,7 @@
     loadFromCloud(currentReg.email);
   }
   handleEmailLinkSignIn();
+  handlePasswordResetLink();
   window.syncToCloud = syncToCloud;
 </script>
 <script>
