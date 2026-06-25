@@ -636,7 +636,7 @@
 
   gateGoogleBtn.innerHTML = `${googleIconSvg} Entrar com Google`;
 
-  if (isStandalone) {
+  if (isStandalone && !isMobileDevice) {
     const hint = document.createElement('p');
     hint.style.fontSize = '12.5px';
     hint.style.color = 'var(--muted)';
@@ -646,7 +646,10 @@
   }
 
   gateGoogleBtn.addEventListener('click', () => {
-    if (isStandalone) {
+    // No iOS/Android instalado como PWA, o app fica num storage isolado do navegador,
+    // então abrir o login numa aba externa nunca reflete o login de volta aqui.
+    // Só vale abrir externamente em PWA de desktop, onde o storage é compartilhado.
+    if (isStandalone && !isMobileDevice) {
       gateError.textContent = 'Abrindo no navegador...';
       window.open(window.location.href.split('#')[0], '_blank');
       return;
@@ -671,9 +674,16 @@
   });
 
   gateError.textContent = 'Verificando login...';
+  const redirectStuckTimer = setTimeout(() => {
+    if (!currentUser) {
+      gateError.textContent = 'Não foi possível concluir o login. Tente novamente.';
+    }
+  }, 10000);
   getRedirectResult(auth).then((result) => {
+    clearTimeout(redirectStuckTimer);
     if (!result) gateError.textContent = '';
   }).catch((err) => {
+    clearTimeout(redirectStuckTimer);
     console.error('Erro no redirect do Google', err);
     gateError.textContent = `Erro no retorno do Google: ${err.code || err.message || err}`;
   });
