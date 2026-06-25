@@ -375,14 +375,6 @@
     color: var(--text);
     white-space: nowrap;
   }
-  .account-bar .account-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 2px solid #3a2e38;
-    cursor: pointer;
-    display: block;
-  }
   .account-menu {
     position: absolute;
     top: 42px;
@@ -416,9 +408,38 @@
     cursor: pointer;
     align-self: flex-end;
   }
-  .google-g {
-    width: 14px;
-    height: 14px;
+  .interaction-lock {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: transparent;
+    cursor: pointer;
+  }
+  .interaction-lock.hidden { display: none; }
+  .cadastro-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 101;
+    padding: 24px;
+  }
+  .cadastro-overlay.hidden { display: none; }
+  .cadastro-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    text-align: left;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+  .cadastro-check input {
+    width: auto;
+    margin: 2px 0 0;
   }
   .detail-overlay {
     position: fixed;
@@ -535,12 +556,23 @@
     </form>
     <div class="gate-error" id="passwordError"></div>
   </div>
-  <div class="gate-box hidden" id="googleStep">
+</div>
+<div id="interactionLock" class="interaction-lock hidden"></div>
+<div id="cadastroOverlay" class="cadastro-overlay hidden">
+  <div class="gate-box">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h2>Garimpa Drink</h2>
-    <p>Entre com sua conta Google para acessar.</p>
-    <button id="gateGoogleBtn" type="button"></button>
-    <div class="gate-error" id="gateError"></div>
+    <p>Cadastro rápido pra continuar.</p>
+    <form id="cadastroForm">
+      <input type="text" id="cadastroNome" placeholder="Seu nome" autocomplete="name">
+      <input type="email" id="cadastroEmail" placeholder="Seu email" autocomplete="email">
+      <label class="cadastro-check">
+        <input type="checkbox" id="cadastroMaior18">
+        Declaro que sou maior de 18 anos.
+      </label>
+      <button type="submit">Continuar</button>
+    </form>
+    <div class="gate-error" id="cadastroError"></div>
   </div>
 </div>
 <header>
@@ -596,7 +628,6 @@
 <script src="data.js?v=20260624-2"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
@@ -611,11 +642,8 @@
   };
 
   const firebaseApp = initializeApp(firebaseConfig);
-  const auth = getAuth(firebaseApp);
   const db = getFirestore(firebaseApp);
   const analytics = getAnalytics(firebaseApp);
-  const googleProvider = new GoogleAuthProvider();
-  let currentUser = null;
 
   window.trackEvent = function (eventName, params) {
     try {
@@ -625,87 +653,41 @@
     }
   };
 
+  const REG_KEY = 'garimpa_cadastro';
   const accountBar = document.getElementById('accountBar');
-  const gateEl = document.getElementById('gate');
-  const gateGoogleBtn = document.getElementById('gateGoogleBtn');
-  const gateError = document.getElementById('gateError');
-  const googleIconSvg = `<svg class="google-g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-2 14-5.3l-6.5-5.4C29.6 35 26.9 36 24 36c-5.3 0-9.6-3.4-11.3-8.1l-6.6 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.5 5.4C40.9 36.2 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>`;
+  const interactionLock = document.getElementById('interactionLock');
+  const cadastroOverlay = document.getElementById('cadastroOverlay');
+  const cadastroForm = document.getElementById('cadastroForm');
+  const cadastroNome = document.getElementById('cadastroNome');
+  const cadastroEmail = document.getElementById('cadastroEmail');
+  const cadastroMaior18 = document.getElementById('cadastroMaior18');
+  const cadastroError = document.getElementById('cadastroError');
 
-  const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-
-  gateGoogleBtn.innerHTML = `${googleIconSvg} Entrar com Google`;
-
-  if (isStandalone && !isMobileDevice) {
-    const hint = document.createElement('p');
-    hint.style.fontSize = '12.5px';
-    hint.style.color = 'var(--muted)';
-    hint.style.marginTop = '14px';
-    hint.textContent = 'Esse app instalado não consegue logar direto. Toque no botão para abrir o login no navegador — depois, volte aqui pelo ícone que já vai estar logado.';
-    gateGoogleBtn.insertAdjacentElement('afterend', hint);
+  function hasBypass() {
+    return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
   }
 
-  gateGoogleBtn.addEventListener('click', () => {
-    // No iOS/Android instalado como PWA, o app fica num storage isolado do navegador,
-    // então abrir o login numa aba externa nunca reflete o login de volta aqui.
-    // Só vale abrir externamente em PWA de desktop, onde o storage é compartilhado.
-    if (isStandalone && !isMobileDevice) {
-      gateError.textContent = 'Abrindo no navegador...';
-      window.open(window.location.href.split('#')[0], '_blank');
-      return;
+  function loadRegistration() {
+    try {
+      const raw = localStorage.getItem(REG_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
     }
-    if (isMobileDevice) {
-      gateError.textContent = 'Redirecionando para o Google...';
-      signInWithRedirect(auth, googleProvider).catch((redirectErr) => {
-        console.error('Redirect falhou', redirectErr);
-        gateError.textContent = `Erro: ${redirectErr.code || redirectErr.message || redirectErr}`;
-      });
-      return;
-    }
-    gateError.textContent = 'Abrindo login do Google...';
-    signInWithPopup(auth, googleProvider).catch((popupErr) => {
-      console.error('Popup falhou', popupErr);
-      gateError.textContent = 'Redirecionando...';
-      signInWithRedirect(auth, googleProvider).catch((redirectErr) => {
-        console.error('Redirect falhou', redirectErr);
-        gateError.textContent = `Erro: ${redirectErr.code || redirectErr.message || redirectErr}`;
-      });
-    });
-  });
+  }
 
-  gateError.textContent = 'Verificando login...';
-  const redirectStuckTimer = setTimeout(() => {
-    if (!currentUser) {
-      gateError.textContent = 'Não foi possível concluir o login. Tente novamente.';
-    }
-  }, 10000);
-  getRedirectResult(auth).then((result) => {
-    clearTimeout(redirectStuckTimer);
-    if (!result) gateError.textContent = '';
-  }).catch((err) => {
-    clearTimeout(redirectStuckTimer);
-    console.error('Erro no redirect do Google', err);
-    gateError.textContent = `Erro no retorno do Google: ${err.code || err.message || err}`;
-  });
-
-  window.addEventListener('error', (e) => {
-    if (gateError) gateError.textContent = `Erro no app: ${e.message}`;
-  });
-  window.addEventListener('unhandledrejection', (e) => {
-    if (gateError) gateError.textContent = `Erro no app: ${e.reason && (e.reason.code || e.reason.message) || e.reason}`;
-  });
+  let currentReg = loadRegistration();
 
   function renderAccountBar() {
-    if (currentUser) {
-      gateEl.classList.add('hidden');
-      const firstName = (currentUser.displayName || currentUser.email || '').trim().split(' ')[0];
+    if (currentReg) {
+      interactionLock.classList.add('hidden');
+      const firstName = (currentReg.nome || '').trim().split(' ')[0];
       accountBar.innerHTML = `
         <div class="account-greeting" id="greetingBtn">
           <span class="account-greeting-text">Olá, ${firstName}!</span>
-          <img class="account-avatar" id="avatarBtn" src="${currentUser.photoURL || ''}" referrerpolicy="no-referrer">
         </div>
         <div class="account-menu" id="accountMenu">
-          <span class="account-name">${currentUser.displayName || currentUser.email}</span>
+          <span class="account-name">${currentReg.nome}</span>
           <button id="logoutBtn">Sair</button>
         </div>
       `;
@@ -716,41 +698,73 @@
       });
       document.getElementById('logoutBtn').addEventListener('click', () => {
         window.trackEvent('logout');
-        signOut(auth);
+        localStorage.removeItem(REG_KEY);
+        currentReg = null;
+        renderAccountBar();
       });
       document.addEventListener('click', () => accountMenu.classList.remove('open'), { once: true });
     } else {
       accountBar.innerHTML = '';
-      if (window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok') {
-        gateEl.classList.add('hidden');
-        return;
-      }
-      gateEl.classList.remove('hidden');
-      if (localStorage.getItem('garimpa_acesso') === 'ok') {
-        document.getElementById('passwordStep').classList.add('hidden');
-        document.getElementById('googleStep').classList.remove('hidden');
-      }
+      interactionLock.classList.toggle('hidden', hasBypass());
     }
   }
 
-  async function syncToCloud() {
-    if (!currentUser) return;
+  interactionLock.addEventListener('click', () => {
+    cadastroError.textContent = '';
+    cadastroOverlay.classList.remove('hidden');
+  });
+
+  cadastroForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = cadastroNome.value.trim();
+    const email = cadastroEmail.value.trim().toLowerCase();
+    const maior18 = cadastroMaior18.checked;
+    if (!nome || !email) {
+      cadastroError.textContent = 'Preencha nome e email.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      cadastroError.textContent = 'Email inválido.';
+      return;
+    }
+    if (!maior18) {
+      cadastroError.textContent = 'É preciso declarar que é maior de 18 anos.';
+      return;
+    }
+    cadastroError.textContent = 'Salvando...';
+    currentReg = { nome, email, maior18: true };
+    localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
     try {
-      await setDoc(doc(db, 'users', currentUser.uid), {
+      await setDoc(doc(db, 'users', email), {
+        nome, email, maior18: true, updatedAt: Date.now()
+      }, { merge: true });
+    } catch (err) {
+      console.error('Erro ao salvar cadastro', err);
+    }
+    cadastroOverlay.classList.add('hidden');
+    renderAccountBar();
+    window.trackEvent('cadastro');
+    await loadFromCloud(email);
+  });
+
+  async function syncToCloud() {
+    if (!currentReg) return;
+    try {
+      await setDoc(doc(db, 'users', currentReg.email), {
         favoritos: [...favoritos],
         visitados: [...visitados],
         embreve: [...embreve],
         drinkFavoritos: [...drinkFavoritos],
         updatedAt: Date.now()
-      });
+      }, { merge: true });
     } catch (err) {
       console.error('Erro ao sincronizar com a nuvem', err);
     }
   }
 
-  async function loadFromCloud(uid) {
+  async function loadFromCloud(email) {
     try {
-      const snap = await getDoc(doc(db, 'users', uid));
+      const snap = await getDoc(doc(db, 'users', email));
       if (snap.exists()) {
         const cloudData = snap.data();
         favoritos = new Set(cloudData.favoritos || []);
@@ -770,17 +784,10 @@
     render();
   }
 
-  onAuthStateChanged(auth, async (user) => {
-    const wasLoggedOut = !currentUser;
-    currentUser = user;
-    renderAccountBar();
-    if (user) {
-      if (wasLoggedOut) window.trackEvent('login', { method: 'google' });
-      await loadFromCloud(user.uid);
-    }
-  });
-
   renderAccountBar();
+  if (currentReg) {
+    loadFromCloud(currentReg.email);
+  }
   window.syncToCloud = syncToCloud;
 </script>
 <script>
@@ -789,28 +796,22 @@
   const BYPASS_KEY = 'garimpa_bypass';
   const BYPASS_PASSWORD = 'penicilinbrasil13';
   const gateEl = document.getElementById('gate');
-  const passwordStep = document.getElementById('passwordStep');
-  const googleStep = document.getElementById('googleStep');
   const gateForm = document.getElementById('gateForm');
   const gatePassword = document.getElementById('gatePassword');
   const passwordError = document.getElementById('passwordError');
-
-  function showGoogleStep() {
-    passwordStep.classList.add('hidden');
-    googleStep.classList.remove('hidden');
-  }
 
   function grantBypass() {
     localStorage.setItem(BYPASS_KEY, 'ok');
     window.garimpaBypass = true;
     gateEl.classList.add('hidden');
+    document.getElementById('interactionLock').classList.add('hidden');
   }
 
   if (localStorage.getItem(BYPASS_KEY) === 'ok') {
     window.garimpaBypass = true;
     gateEl.classList.add('hidden');
   } else if (localStorage.getItem(GATE_KEY) === 'ok') {
-    showGoogleStep();
+    gateEl.classList.add('hidden');
   }
 
   gateForm.addEventListener('submit', (e) => {
@@ -821,7 +822,7 @@
     } else if (gatePassword.value === GATE_PASSWORD) {
       localStorage.setItem(GATE_KEY, 'ok');
       passwordError.textContent = '';
-      showGoogleStep();
+      gateEl.classList.add('hidden');
     } else {
       passwordError.textContent = 'Senha incorreta. Tente novamente.';
       gatePassword.value = '';
