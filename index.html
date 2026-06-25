@@ -419,7 +419,7 @@
   .cadastro-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    background: rgba(0, 0, 0, 0.65);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -427,6 +427,27 @@
     padding: 24px;
   }
   .cadastro-overlay.hidden { display: none; }
+  .cadastro-overlay .gate-box {
+    position: relative;
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+  .gate-box button.cadastro-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
   .cadastro-check {
     display: flex;
     align-items: flex-start;
@@ -560,6 +581,7 @@
 <div id="interactionLock" class="interaction-lock hidden"></div>
 <div id="cadastroOverlay" class="cadastro-overlay hidden">
   <div class="gate-box">
+    <button type="button" class="cadastro-close" id="cadastroClose" aria-label="Fechar">&times;</button>
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h2>Garimpa Drink</h2>
     <p>Cadastro rápido pra continuar.</p>
@@ -662,6 +684,7 @@
   const cadastroEmail = document.getElementById('cadastroEmail');
   const cadastroMaior18 = document.getElementById('cadastroMaior18');
   const cadastroError = document.getElementById('cadastroError');
+  const cadastroClose = document.getElementById('cadastroClose');
 
   function hasBypass() {
     return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
@@ -712,6 +735,11 @@
   interactionLock.addEventListener('click', () => {
     cadastroError.textContent = '';
     cadastroOverlay.classList.remove('hidden');
+  });
+
+  cadastroClose.addEventListener('click', () => {
+    cadastroOverlay.classList.add('hidden');
+    cadastroError.textContent = '';
   });
 
   cadastroForm.addEventListener('submit', async (e) => {
