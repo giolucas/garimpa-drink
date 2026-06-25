@@ -427,6 +427,17 @@
     padding: 24px;
   }
   .cadastro-overlay.hidden { display: none; }
+  .cadastro-overlay .hidden { display: none; }
+  .cadastro-switch {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 12px 0 0;
+  }
+  .cadastro-switch a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
   .cadastro-overlay .gate-box {
     position: relative;
     background: var(--bg);
@@ -585,16 +596,27 @@
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h2>Garimpa Drink</h2>
     <p>Cadastro rápido pra continuar.</p>
-    <form id="cadastroForm">
-      <input type="text" id="cadastroNome" placeholder="Seu nome" autocomplete="name">
-      <input type="email" id="cadastroEmail" placeholder="Seu email" autocomplete="email">
-      <label class="cadastro-check">
-        <input type="checkbox" id="cadastroMaior18">
-        Declaro que sou maior de 18 anos.
-      </label>
-      <button type="submit">Continuar</button>
-    </form>
-    <div class="gate-error" id="cadastroError"></div>
+    <div id="cadastroRegisterBlock">
+      <form id="cadastroForm">
+        <input type="text" id="cadastroNome" placeholder="Seu nome" autocomplete="name">
+        <input type="email" id="cadastroEmail" placeholder="Seu email" autocomplete="email">
+        <label class="cadastro-check">
+          <input type="checkbox" id="cadastroMaior18">
+          Declaro que sou maior de 18 anos.
+        </label>
+        <button type="submit">Continuar</button>
+      </form>
+      <div class="gate-error" id="cadastroError"></div>
+      <p class="cadastro-switch">Já tem cadastro? <a href="#" id="showLoginLink">Entrar com seu email</a></p>
+    </div>
+    <div id="cadastroLoginBlock" class="hidden">
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Seu email" autocomplete="email">
+        <button type="submit">Entrar</button>
+      </form>
+      <div class="gate-error" id="loginError"></div>
+      <p class="cadastro-switch"><a href="#" id="showCadastroLink">Voltar para cadastro</a></p>
+    </div>
   </div>
 </div>
 <header>
@@ -685,6 +707,13 @@
   const cadastroMaior18 = document.getElementById('cadastroMaior18');
   const cadastroError = document.getElementById('cadastroError');
   const cadastroClose = document.getElementById('cadastroClose');
+  const cadastroRegisterBlock = document.getElementById('cadastroRegisterBlock');
+  const cadastroLoginBlock = document.getElementById('cadastroLoginBlock');
+  const showLoginLink = document.getElementById('showLoginLink');
+  const showCadastroLink = document.getElementById('showCadastroLink');
+  const loginForm = document.getElementById('loginForm');
+  const loginEmail = document.getElementById('loginEmail');
+  const loginError = document.getElementById('loginError');
 
   function hasBypass() {
     return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
@@ -732,14 +761,62 @@
     }
   }
 
-  interactionLock.addEventListener('click', () => {
+  function showCadastroBlock() {
+    cadastroLoginBlock.classList.add('hidden');
+    cadastroRegisterBlock.classList.remove('hidden');
     cadastroError.textContent = '';
+    loginError.textContent = '';
+  }
+
+  interactionLock.addEventListener('click', () => {
+    showCadastroBlock();
     cadastroOverlay.classList.remove('hidden');
   });
 
   cadastroClose.addEventListener('click', () => {
     cadastroOverlay.classList.add('hidden');
     cadastroError.textContent = '';
+    loginError.textContent = '';
+  });
+
+  showLoginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    cadastroRegisterBlock.classList.add('hidden');
+    cadastroLoginBlock.classList.remove('hidden');
+    cadastroError.textContent = '';
+    loginError.textContent = '';
+  });
+
+  showCadastroLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showCadastroBlock();
+  });
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = loginEmail.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      loginError.textContent = 'Email inválido.';
+      return;
+    }
+    loginError.textContent = 'Entrando...';
+    try {
+      const snap = await getDoc(doc(db, 'users', email));
+      if (!snap.exists()) {
+        loginError.textContent = 'Email não encontrado. Faça o cadastro.';
+        return;
+      }
+      const data = snap.data();
+      currentReg = { nome: data.nome || '', email, maior18: true };
+      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+      cadastroOverlay.classList.add('hidden');
+      renderAccountBar();
+      window.trackEvent('login');
+      await loadFromCloud(email);
+    } catch (err) {
+      console.error('Erro ao entrar', err);
+      loginError.textContent = 'Erro ao entrar. Tente novamente.';
+    }
   });
 
   cadastroForm.addEventListener('submit', async (e) => {
