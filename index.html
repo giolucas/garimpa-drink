@@ -724,6 +724,20 @@
     handleCodeInApp: true,
   };
 
+  function withTimeout(promise, ms = 15000) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        reject(Object.assign(new Error('Conexão demorou demais. Verifique sua internet.'), { code: 'app/timeout' }));
+      }, ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+  }
+
+  function describeError(err) {
+    return err.code === 'app/timeout' ? err.message : (err.code || err.message);
+  }
+
   window.trackEvent = function (eventName, params) {
     try {
       logEvent(analytics, eventName, params || {});
@@ -886,8 +900,8 @@
     }
     loginError.textContent = 'Entrando...';
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      const snap = await getDoc(doc(db, 'users', email));
+      await withTimeout(signInWithEmailAndPassword(auth, email, password));
+      const snap = await withTimeout(getDoc(doc(db, 'users', email)));
       const nome = snap.exists() ? (snap.data().nome || '') : '';
       currentReg = { nome, email, maior18: true };
       localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
@@ -897,7 +911,11 @@
       await loadFromCloud(email);
     } catch (err) {
       console.error('Erro ao entrar', err);
-      loginError.textContent = 'Email ou senha incorretos.';
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        loginError.textContent = 'Email ou senha incorretos.';
+      } else {
+        loginError.textContent = `Erro ao entrar (${describeError(err)}). Tente novamente.`;
+      }
     }
   });
 
@@ -910,12 +928,12 @@
     }
     forgotError.textContent = 'Enviando...';
     try {
-      await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      await withTimeout(sendPasswordResetEmail(auth, email, actionCodeSettings));
       forgotError.textContent = `Enviamos um link de redefinição de senha para ${email}. Confira sua caixa de entrada.`;
       window.trackEvent('senha_esquecida_link_enviado');
     } catch (err) {
       console.error('Erro ao enviar link de redefinição', err);
-      forgotError.textContent = `Não foi possível enviar o email (${err.code || err.message}). Tente novamente.`;
+      forgotError.textContent = `Não foi possível enviar o email (${describeError(err)}). Tente novamente.`;
     }
   });
 
@@ -938,7 +956,7 @@
     }
     cadastroError.textContent = 'Enviando link de confirmação...';
     try {
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      await withTimeout(sendSignInLinkToEmail(auth, email, actionCodeSettings));
       localStorage.setItem(PENDING_KEY, JSON.stringify({ nome, email, maior18: true }));
       localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
       cadastroCheckEmailText.textContent = `Enviamos um link de confirmação para ${email}. Abra-o e clique no link para continuar.`;
@@ -946,7 +964,7 @@
       window.trackEvent('cadastro_link_enviado');
     } catch (err) {
       console.error('Erro ao enviar link de confirmação', err);
-      cadastroError.textContent = 'Não foi possível enviar o email. Tente novamente.';
+      cadastroError.textContent = `Não foi possível enviar o email (${describeError(err)}). Tente novamente.`;
     }
   });
 
@@ -967,19 +985,19 @@
       const oobCode = resetOobCode;
       const email = pendingAuthEmail;
       try {
-        await confirmPasswordReset(auth, oobCode, pass);
+        await withTimeout(confirmPasswordReset(auth, oobCode, pass));
       } catch (err) {
         console.error('Erro ao redefinir senha (confirmPasswordReset)', err);
-        passwordSetError.textContent = `Erro ao redefinir senha (${err.code || err.message}). Tente novamente.`;
+        passwordSetError.textContent = `Erro ao redefinir senha (${describeError(err)}). Tente novamente.`;
         return;
       }
       resetOobCode = null;
       try {
-        await signInWithEmailAndPassword(auth, email, pass);
+        await withTimeout(signInWithEmailAndPassword(auth, email, pass));
       } catch (err) {
         console.error('Erro ao entrar após redefinir senha', err);
       }
-      const snap = await getDoc(doc(db, 'users', email)).catch(() => null);
+      const snap = await withTimeout(getDoc(doc(db, 'users', email))).catch(() => null);
       const nome = snap && snap.exists() ? (snap.data().nome || '') : '';
       currentReg = { nome, email, maior18: true };
       localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
@@ -995,10 +1013,10 @@
     }
     passwordSetError.textContent = 'Salvando...';
     try {
-      await updatePassword(auth.currentUser, pass);
+      await withTimeout(updatePassword(auth.currentUser, pass));
     } catch (err) {
       console.error('Erro ao criar senha (updatePassword)', err);
-      passwordSetError.textContent = `Erro ao criar senha (${err.code || err.message}). Tente novamente.`;
+      passwordSetError.textContent = `Erro ao criar senha (${describeError(err)}). Tente novamente.`;
       return;
     }
     const pendingRaw = localStorage.getItem(PENDING_KEY);
@@ -1009,12 +1027,12 @@
     localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
     localStorage.removeItem(PENDING_KEY);
     try {
-      await setDoc(doc(db, 'users', email), {
+      await withTimeout(setDoc(doc(db, 'users', email), {
         nome, email, maior18: true, emailVerified: true, updatedAt: Date.now()
-      }, { merge: true });
+      }, { merge: true }));
     } catch (err) {
       console.error('Erro ao salvar cadastro (setDoc)', err);
-      passwordSetError.textContent = `Senha criada, mas houve um erro ao salvar o cadastro (${err.code || err.message}).`;
+      passwordSetError.textContent = `Senha criada, mas houve um erro ao salvar o cadastro (${describeError(err)}).`;
       return;
     }
     cadastroOverlay.classList.add('hidden');
@@ -1031,7 +1049,7 @@
     }
     if (!email) return;
     try {
-      await signInWithEmailLink(auth, email, window.location.href);
+      await withTimeout(signInWithEmailLink(auth, email, window.location.href));
       window.history.replaceState({}, document.title, window.location.pathname);
       localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
       pendingAuthEmail = email;
@@ -1040,7 +1058,7 @@
       cadastroOverlay.classList.remove('hidden');
     } catch (err) {
       console.error('Erro ao confirmar email', err);
-      checkEmailError.textContent = 'Link inválido ou expirado. Faça o cadastro novamente.';
+      checkEmailError.textContent = `Link inválido ou expirado (${describeError(err)}). Faça o cadastro novamente.`;
       showBlock('checkEmail');
       cadastroOverlay.classList.remove('hidden');
     }
@@ -1053,7 +1071,7 @@
     if (!oobCode) return;
     window.history.replaceState({}, document.title, window.location.pathname);
     try {
-      const email = await verifyPasswordResetCode(auth, oobCode);
+      const email = await withTimeout(verifyPasswordResetCode(auth, oobCode));
       resetOobCode = oobCode;
       pendingAuthEmail = email;
       passwordSetIntro.textContent = 'Link confirmado! Defina sua nova senha.';
@@ -1061,7 +1079,7 @@
       cadastroOverlay.classList.remove('hidden');
     } catch (err) {
       console.error('Erro ao verificar link de redefinição', err);
-      loginError.textContent = 'Link inválido ou expirado. Solicite a redefinição novamente.';
+      loginError.textContent = `Link inválido ou expirado (${describeError(err)}). Solicite a redefinição novamente.`;
       showBlock('login');
       cadastroOverlay.classList.remove('hidden');
     }
