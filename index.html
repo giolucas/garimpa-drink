@@ -831,6 +831,7 @@
         </div>
         <div class="account-menu" id="accountMenu">
           <span class="account-name">${currentReg.nome}</span>
+          <button id="editNomeBtn">Editar nome</button>
           <button id="logoutBtn">Sair</button>
         </div>
       `;
@@ -838,6 +839,19 @@
       document.getElementById('greetingBtn').addEventListener('click', (e) => {
         e.stopPropagation();
         accountMenu.classList.toggle('open');
+      });
+      document.getElementById('editNomeBtn').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const novoNome = window.prompt('Seu nome:', currentReg.nome || '');
+        if (!novoNome || !novoNome.trim()) return;
+        currentReg = { ...currentReg, nome: novoNome.trim() };
+        localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+        renderAccountBar();
+        try {
+          await setDoc(doc(db, 'users', currentReg.email), { nome: currentReg.nome }, { merge: true });
+        } catch (err) {
+          console.error('Erro ao salvar nome', err);
+        }
       });
       document.getElementById('logoutBtn').addEventListener('click', () => {
         window.trackEvent('logout');
