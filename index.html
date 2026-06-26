@@ -614,6 +614,14 @@
       <div class="gate-error" id="checkEmailError"></div>
       <p class="cadastro-switch"><a href="#" id="backToCadastroFromCheck">Voltar</a></p>
     </div>
+    <div id="cadastroConfirmEmailBlock" class="hidden">
+      <p>Confirme seu email para continuar (você abriu o link em um app diferente do que usou para se cadastrar).</p>
+      <form id="confirmEmailForm">
+        <input type="email" id="confirmEmailInput" placeholder="Seu email" autocomplete="email">
+        <button type="submit">Confirmar</button>
+      </form>
+      <div class="gate-error" id="confirmEmailError"></div>
+    </div>
     <div id="cadastroPasswordBlock" class="hidden">
       <p id="passwordSetIntro">Email confirmado! Agora crie uma senha de acesso.</p>
       <form id="passwordSetForm">
@@ -763,6 +771,10 @@
   const cadastroCheckEmailText = document.getElementById('cadastroCheckEmailText');
   const checkEmailError = document.getElementById('checkEmailError');
   const backToCadastroFromCheck = document.getElementById('backToCadastroFromCheck');
+  const cadastroConfirmEmailBlock = document.getElementById('cadastroConfirmEmailBlock');
+  const confirmEmailForm = document.getElementById('confirmEmailForm');
+  const confirmEmailInput = document.getElementById('confirmEmailInput');
+  const confirmEmailError = document.getElementById('confirmEmailError');
   const cadastroPasswordBlock = document.getElementById('cadastroPasswordBlock');
   const passwordSetIntro = document.getElementById('passwordSetIntro');
   const passwordSetForm = document.getElementById('passwordSetForm');
@@ -783,7 +795,16 @@
   const forgotError = document.getElementById('forgotError');
   const backToLoginFromForgot = document.getElementById('backToLoginFromForgot');
   let pendingAuthEmail = null;
+  let pendingAuthNome = null;
   let resetOobCode = null;
+
+  function buildSignInUrl(extraParams) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    for (const key in extraParams) {
+      if (extraParams[key]) url.searchParams.set(key, extraParams[key]);
+    }
+    return url.toString();
+  }
 
   function hasBypass() {
     return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
@@ -835,6 +856,7 @@
   const cadastroBlocks = {
     register: cadastroRegisterBlock,
     checkEmail: cadastroCheckEmailBlock,
+    confirmEmail: cadastroConfirmEmailBlock,
     password: cadastroPasswordBlock,
     login: cadastroLoginBlock,
     forgot: cadastroForgotBlock,
@@ -846,6 +868,7 @@
     }
     cadastroError.textContent = '';
     checkEmailError.textContent = '';
+    confirmEmailError.textContent = '';
     passwordSetError.textContent = '';
     loginError.textContent = '';
     forgotError.textContent = '';
@@ -956,7 +979,8 @@
     }
     cadastroError.textContent = 'Enviando link de confirmação...';
     try {
-      await withTimeout(sendSignInLinkToEmail(auth, email, actionCodeSettings));
+      const settings = { url: buildSignInUrl({ nome, email }), handleCodeInApp: true };
+      await withTimeout(sendSignInLinkToEmail(auth, email, settings));
       localStorage.setItem(PENDING_KEY, JSON.stringify({ nome, email, maior18: true }));
       localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
       cadastroCheckEmailText.textContent = `Enviamos um link de confirmação para ${email}. Abra-o e clique no link para continuar.`;
@@ -1022,7 +1046,7 @@
     const pendingRaw = localStorage.getItem(PENDING_KEY);
     const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
     const email = pendingAuthEmail || (pending && pending.email) || auth.currentUser.email;
-    const nome = (pending && pending.nome) || '';
+    const nome = (pending && pending.nome) || pendingAuthNome || '';
     currentReg = { nome, email, maior18: true };
     localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
     localStorage.removeItem(PENDING_KEY);
@@ -1041,18 +1065,14 @@
     await loadFromCloud(email);
   });
 
-  async function handleEmailLinkSignIn() {
-    if (!isSignInWithEmailLink(auth, window.location.href)) return;
-    let email = localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
-    if (!email) {
-      email = window.prompt('Confirme seu email para continuar:');
-    }
-    if (!email) return;
+  async function completeEmailLinkSignIn(email, nome) {
+    const href = window.location.href;
     try {
-      await withTimeout(signInWithEmailLink(auth, email, window.location.href));
+      await withTimeout(signInWithEmailLink(auth, email, href));
       window.history.replaceState({}, document.title, window.location.pathname);
       localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
       pendingAuthEmail = email;
+      pendingAuthNome = nome || pendingAuthNome;
       passwordSetIntro.textContent = 'Email confirmado! Agora crie uma senha de acesso.';
       showBlock('password');
       cadastroOverlay.classList.remove('hidden');
@@ -1063,6 +1083,30 @@
       cadastroOverlay.classList.remove('hidden');
     }
   }
+
+  async function handleEmailLinkSignIn() {
+    if (!isSignInWithEmailLink(auth, window.location.href)) return;
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email') || localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
+    const nome = params.get('nome');
+    if (!email) {
+      showBlock('confirmEmail');
+      cadastroOverlay.classList.remove('hidden');
+      return;
+    }
+    await completeEmailLinkSignIn(email, nome);
+  }
+
+  confirmEmailForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = confirmEmailInput.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      confirmEmailError.textContent = 'Email inválido.';
+      return;
+    }
+    confirmEmailError.textContent = 'Confirmando...';
+    await completeEmailLinkSignIn(email);
+  });
 
   async function handlePasswordResetLink() {
     const params = new URLSearchParams(window.location.search);
