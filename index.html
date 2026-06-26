@@ -168,6 +168,19 @@
     color: #fff;
     background: var(--magenta);
   }
+  .ai-recommend-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--magenta);
+    background: transparent;
+    color: var(--magenta);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
   .heart-btn {
     appearance: none;
     border: none;
@@ -338,6 +351,20 @@
     margin-bottom: 10px;
   }
   .gate-box input:focus { border-color: var(--accent); }
+  .gate-box textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #3a2e38;
+    background: #1c1c1e;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 10px;
+    resize: vertical;
+  }
+  .gate-box textarea:focus { border-color: var(--accent); }
   .gate-box button {
     width: 100%;
     padding: 12px 14px;
@@ -408,14 +435,18 @@
     cursor: pointer;
     align-self: flex-end;
   }
-  .interaction-lock {
-    position: fixed;
-    inset: 0;
-    z-index: 90;
+  .account-login-btn {
+    appearance: none;
+    border: 1px solid #3a2e38;
     background: transparent;
+    color: var(--text);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
     cursor: pointer;
   }
-  .interaction-lock.hidden { display: none; }
   .cadastro-overlay {
     position: fixed;
     inset: 0;
@@ -589,7 +620,6 @@
     <div class="gate-error" id="passwordError"></div>
   </div>
 </div>
-<div id="interactionLock" class="interaction-lock hidden"></div>
 <div id="cadastroOverlay" class="cadastro-overlay hidden">
   <div class="gate-box">
     <button type="button" class="cadastro-close" id="cadastroClose" aria-label="Fechar">&times;</button>
@@ -652,6 +682,25 @@
     </div>
   </div>
 </div>
+<div id="aiRecommendOverlay" class="cadastro-overlay hidden">
+  <div class="gate-box">
+    <button type="button" class="cadastro-close" id="aiRecommendClose" aria-label="Fechar">&times;</button>
+    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <h2>Me indique um bar</h2>
+    <div id="aiRecommendAskBlock">
+      <p>Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.</p>
+      <form id="aiRecommendForm">
+        <textarea id="aiRecommendInput" rows="4" placeholder="Ex: bar intimista em Pinheiros pra um encontro"></textarea>
+        <button type="submit">Buscar sugestão</button>
+      </form>
+      <div class="gate-error" id="aiRecommendError"></div>
+    </div>
+    <div id="aiRecommendResultBlock" class="hidden">
+      <p>Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀</p>
+      <button type="button" id="aiRecommendCloseResult">Fechar</button>
+    </div>
+  </div>
+</div>
 <header>
   <div class="brand">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
@@ -670,6 +719,7 @@
     <div class="toggle-btn" data-val="visited">Visitados</div>
     <div class="toggle-btn" data-val="embreve">Ir em Breve</div>
   </div>
+  <button type="button" class="ai-recommend-btn" id="aiRecommendBtn">🍸 Me indique um bar de drink</button>
 </header>
 <main>
   <div class="count" id="count"></div>
@@ -758,7 +808,6 @@
   const PENDING_KEY = 'garimpa_pendente_cadastro';
   const EMAIL_FOR_SIGNIN_KEY = 'garimpa_email_signin';
   const accountBar = document.getElementById('accountBar');
-  const interactionLock = document.getElementById('interactionLock');
   const cadastroOverlay = document.getElementById('cadastroOverlay');
   const cadastroForm = document.getElementById('cadastroForm');
   const cadastroNome = document.getElementById('cadastroNome');
@@ -806,10 +855,6 @@
     return url.toString();
   }
 
-  function hasBypass() {
-    return window.garimpaBypass || localStorage.getItem('garimpa_bypass') === 'ok';
-  }
-
   function loadRegistration() {
     try {
       const raw = localStorage.getItem(REG_KEY);
@@ -823,7 +868,6 @@
 
   function renderAccountBar() {
     if (currentReg) {
-      interactionLock.classList.add('hidden');
       const firstName = (currentReg.nome || '').trim().split(' ')[0];
       accountBar.innerHTML = `
         <div class="account-greeting" id="greetingBtn">
@@ -862,8 +906,11 @@
       });
       document.addEventListener('click', () => accountMenu.classList.remove('open'), { once: true });
     } else {
-      accountBar.innerHTML = '';
-      interactionLock.classList.toggle('hidden', hasBypass());
+      accountBar.innerHTML = '<button class="account-login-btn" id="openLoginBtn">Entrar / Cadastrar</button>';
+      document.getElementById('openLoginBtn').addEventListener('click', () => {
+        showBlock('register');
+        cadastroOverlay.classList.remove('hidden');
+      });
     }
   }
 
@@ -887,11 +934,6 @@
     loginError.textContent = '';
     forgotError.textContent = '';
   }
-
-  interactionLock.addEventListener('click', () => {
-    showBlock('register');
-    cadastroOverlay.classList.remove('hidden');
-  });
 
   cadastroClose.addEventListener('click', () => {
     cadastroOverlay.classList.add('hidden');
@@ -1187,6 +1229,54 @@
   handleEmailLinkSignIn();
   handlePasswordResetLink();
   window.syncToCloud = syncToCloud;
+
+  const aiRecommendBtn = document.getElementById('aiRecommendBtn');
+  const aiRecommendOverlay = document.getElementById('aiRecommendOverlay');
+  const aiRecommendClose = document.getElementById('aiRecommendClose');
+  const aiRecommendAskBlock = document.getElementById('aiRecommendAskBlock');
+  const aiRecommendForm = document.getElementById('aiRecommendForm');
+  const aiRecommendInput = document.getElementById('aiRecommendInput');
+  const aiRecommendError = document.getElementById('aiRecommendError');
+  const aiRecommendResultBlock = document.getElementById('aiRecommendResultBlock');
+  const aiRecommendCloseResult = document.getElementById('aiRecommendCloseResult');
+
+  function closeAiRecommend() {
+    aiRecommendOverlay.classList.add('hidden');
+    aiRecommendAskBlock.classList.remove('hidden');
+    aiRecommendResultBlock.classList.add('hidden');
+    aiRecommendError.textContent = '';
+    aiRecommendInput.value = '';
+  }
+
+  aiRecommendBtn.addEventListener('click', () => {
+    window.trackEvent('bar_recommendation_cta_click');
+    aiRecommendOverlay.classList.remove('hidden');
+  });
+  aiRecommendClose.addEventListener('click', closeAiRecommend);
+  aiRecommendCloseResult.addEventListener('click', closeAiRecommend);
+
+  aiRecommendForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pergunta = aiRecommendInput.value.trim();
+    if (!pergunta) {
+      aiRecommendError.textContent = 'Conta pra gente o que você procura.';
+      return;
+    }
+    aiRecommendError.textContent = '';
+    const id = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    try {
+      await withTimeout(setDoc(doc(db, 'pedidos_bar_ia', id), {
+        pergunta,
+        email: currentReg ? currentReg.email : null,
+        criadoEm: Date.now()
+      }));
+    } catch (err) {
+      console.error('Erro ao salvar pedido de recomendação', err);
+    }
+    window.trackEvent('bar_recommendation_requested', { pergunta });
+    aiRecommendAskBlock.classList.add('hidden');
+    aiRecommendResultBlock.classList.remove('hidden');
+  });
 </script>
 <script>
   const GATE_KEY = 'garimpa_acesso';
@@ -1202,7 +1292,6 @@
     localStorage.setItem(BYPASS_KEY, 'ok');
     window.garimpaBypass = true;
     gateEl.classList.add('hidden');
-    document.getElementById('interactionLock').classList.add('hidden');
   }
 
   if (localStorage.getItem(BYPASS_KEY) === 'ok') {
