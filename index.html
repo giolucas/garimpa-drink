@@ -389,6 +389,9 @@
     top: 16px;
     right: 16px;
     z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .account-greeting {
     display: flex;
@@ -773,8 +776,11 @@
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
-  <div class="subtitle">O básico para você beber além do básico em São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
-  <div class="account-bar" id="accountBar"></div>
+  <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <div class="account-bar">
+    <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
+    <div id="accountBar"></div>
+  </div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -1387,12 +1393,17 @@
     onboardingOverlay.classList.add('hidden');
   }
 
-  function showOnboarding() {
-    if (localStorage.getItem(ONBOARDING_KEY) === 'ok') return;
+  function showOnboarding(force) {
+    if (!force && localStorage.getItem(ONBOARDING_KEY) === 'ok') return;
     onboardingStep = 0;
     renderOnboardingStep();
     onboardingOverlay.classList.remove('hidden');
   }
+
+  document.getElementById('howToStartBtn').addEventListener('click', () => {
+    if (window.trackEvent) window.trackEvent('onboarding_manual_open');
+    showOnboarding(true);
+  });
 
   onboardingNextBtn.addEventListener('click', () => {
     if (onboardingStep === onboardingSteps.length - 1) {
