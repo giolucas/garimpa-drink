@@ -394,6 +394,65 @@
     display: block;
     margin: 10px auto 0;
   }
+  .ranking-btn {
+    display: block;
+    margin: 8px auto 0;
+  }
+  .ranking-box {
+    max-width: 360px;
+    text-align: left;
+  }
+  .ranking-box h2 { text-align: center; }
+  .ranking-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 14px 0;
+  }
+  .ranking-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    border: 1px solid #3a2e38;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    background: #1c1c1e;
+  }
+  .ranking-tab.active {
+    border-color: var(--magenta);
+    color: #fff;
+    background: var(--magenta);
+  }
+  .ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #1c1c1e;
+  }
+  .ranking-rank {
+    font-weight: 800;
+    color: var(--accent);
+    min-width: 22px;
+  }
+  .ranking-name { flex: 1; font-size: 13.5px; }
+  .ranking-count { font-size: 12px; color: var(--muted); }
+  .ranking-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px 0;
+  }
   .account-greeting {
     display: flex;
     align-items: center;
@@ -799,6 +858,18 @@
     </div>
   </div>
 </div>
+<div id="rankingOverlay" class="cadastro-overlay hidden">
+  <div class="gate-box ranking-box">
+    <button type="button" class="cadastro-close" id="rankingClose" aria-label="Fechar">&times;</button>
+    <h2>Ranking dos bares</h2>
+    <div class="ranking-tabs">
+      <div class="ranking-tab active" data-field="visitados">Mais visitados</div>
+      <div class="ranking-tab" data-field="favoritos">Mais favoritados</div>
+      <div class="ranking-tab" data-field="embreve">Mais ir em breve</div>
+    </div>
+    <div class="ranking-list" id="rankingList"></div>
+  </div>
+</div>
 <header>
   <div class="brand">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
@@ -819,6 +890,7 @@
   </div>
   <button type="button" class="ai-recommend-btn" id="aiRecommendBtn">Me indique um bar de drink</button>
   <button type="button" class="account-login-btn how-to-start-btn" id="howToStartBtn">Como começar</button>
+  <button type="button" class="account-login-btn ranking-btn" id="rankingBtn">Ranking dos bares</button>
 </header>
 <main>
   <div class="count" id="count"></div>
@@ -854,7 +926,7 @@
 <script src="data.js?v=20260624-2"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
   import {
     getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
@@ -1329,6 +1401,31 @@
   handlePasswordResetLink();
   window.syncToCloud = syncToCloud;
 
+  async function bumpBarStat(barId, field, delta) {
+    const b = data.find(item => item._id === barId);
+    try {
+      await setDoc(doc(db, 'bar_stats', String(barId)), {
+        bar: b ? b.bar : null,
+        [field]: increment(delta)
+      }, { merge: true });
+    } catch (err) {
+      console.error('Erro ao atualizar ranking do bar', err);
+    }
+  }
+  window.bumpBarStat = bumpBarStat;
+
+  async function loadBarRanking() {
+    const stats = {};
+    try {
+      const snap = await getDocs(collection(db, 'bar_stats'));
+      snap.forEach((d) => { stats[d.id] = d.data(); });
+    } catch (err) {
+      console.error('Erro ao carregar ranking dos bares', err);
+    }
+    return stats;
+  }
+  window.loadBarRanking = loadBarRanking;
+
   const aiRecommendBtn = document.getElementById('aiRecommendBtn');
   const aiRecommendOverlay = document.getElementById('aiRecommendOverlay');
   const aiRecommendClose = document.getElementById('aiRecommendClose');
@@ -1434,6 +1531,56 @@
     showOnboarding(true);
   });
 
+  const rankingBtn = document.getElementById('rankingBtn');
+  const rankingOverlay = document.getElementById('rankingOverlay');
+  const rankingClose = document.getElementById('rankingClose');
+  const rankingList = document.getElementById('rankingList');
+  const rankingTabs = rankingOverlay.querySelectorAll('.ranking-tab');
+  let rankingField = 'visitados';
+  let rankingStats = null;
+
+  function renderRanking() {
+    if (!rankingStats) {
+      rankingList.innerHTML = '<div class="ranking-empty">Carregando...</div>';
+      return;
+    }
+    const entries = Object.entries(rankingStats)
+      .map(([id, stat]) => ({ bar: stat.bar, count: stat[rankingField] || 0 }))
+      .filter((e) => e.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+    if (entries.length === 0) {
+      rankingList.innerHTML = '<div class="ranking-empty">Ainda não há dados suficientes.</div>';
+      return;
+    }
+    rankingList.innerHTML = entries.map((e, i) => `
+      <div class="ranking-item">
+        <span class="ranking-rank">${i + 1}º</span>
+        <span class="ranking-name">${e.bar || 'Bar'}</span>
+        <span class="ranking-count">${e.count}</span>
+      </div>
+    `).join('');
+  }
+
+  rankingTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      rankingTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      rankingField = tab.dataset.field;
+      renderRanking();
+    });
+  });
+
+  rankingBtn.addEventListener('click', async () => {
+    if (window.trackEvent) window.trackEvent('ranking_open');
+    rankingOverlay.classList.remove('hidden');
+    rankingStats = null;
+    renderRanking();
+    rankingStats = window.loadBarRanking ? await window.loadBarRanking() : {};
+    renderRanking();
+  });
+  rankingClose.addEventListener('click', () => rankingOverlay.classList.add('hidden'));
+
   onboardingNextBtn.addEventListener('click', () => {
     if (onboardingStep === onboardingSteps.length - 1) {
       if (window.trackEvent) window.trackEvent('onboarding_complete');
@@ -1499,6 +1646,7 @@
     else favoritos.add(id);
     saveFavoritos();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.bumpBarStat) window.bumpBarStat(id, 'favoritos', isAdding ? 1 : -1);
     if (window.trackEvent) {
       const b = data.find(item => item._id === id);
       window.trackEvent(isAdding ? 'add_favorito' : 'remove_favorito', { bar_name: b ? b.bar : id });
@@ -1520,6 +1668,7 @@
     else embreve.add(id);
     saveEmbreve();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.bumpBarStat) window.bumpBarStat(id, 'embreve', isAdding ? 1 : -1);
     if (window.trackEvent) {
       const b = data.find(item => item._id === id);
       window.trackEvent(isAdding ? 'add_embreve' : 'remove_embreve', { bar_name: b ? b.bar : id });
@@ -1541,6 +1690,7 @@
     else visitados.add(id);
     saveVisitados();
     if (window.syncToCloud) window.syncToCloud();
+    if (window.bumpBarStat) window.bumpBarStat(id, 'visitados', isAdding ? 1 : -1);
     if (window.trackEvent) {
       const b = data.find(item => item._id === id);
       window.trackEvent(isAdding ? 'add_visitado' : 'remove_visitado', { bar_name: b ? b.bar : id });
