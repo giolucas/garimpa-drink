@@ -535,6 +535,20 @@
     background: #3a2e38;
   }
   .onboarding-dots span.active { background: var(--accent); }
+  .onboarding-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .onboarding-actions button {
+    width: auto;
+    flex: 1;
+  }
+  .gate-box .onboarding-back-btn {
+    background: transparent;
+    border: 1px solid #3a2e38;
+    color: var(--text);
+  }
+  .onboarding-back-btn.hidden { display: none; }
   .detail-overlay {
     position: fixed;
     inset: 0;
@@ -646,6 +660,10 @@
     <p>Acesso restrito. Digite a senha para entrar.</p>
     <form id="gateForm">
       <input type="password" id="gatePassword" placeholder="Senha" autocomplete="current-password">
+      <label class="cadastro-check">
+        <input type="checkbox" id="gateMaior18">
+        Declaro que sou maior de 18 anos.
+      </label>
       <button type="submit">Entrar</button>
     </form>
     <div class="gate-error" id="passwordError"></div>
@@ -717,27 +735,32 @@
   <div class="gate-box">
     <button type="button" class="cadastro-close" id="onboardingClose" aria-label="Fechar">&times;</button>
     <div class="onboarding-step" data-step="0">
+      <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+      <h2>Boas vindas ao Garimpa Drink!</h2>
+      <p>Esperamos que aproveite muito e que beba com moderação. 😊</p>
+    </div>
+    <div class="onboarding-step hidden" data-step="1">
       <div class="onboarding-icon-wrap" style="color: var(--accent);">
         <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
       </div>
       <h2>Veja o Instagram do bar</h2>
-      <p>Toque no ícone do Instagram em qualquer card pra abrir o perfil do bar direto no app.</p>
+      <p>Toque no ícone do Instagram em qualquer card pra abrir o perfil do bar.</p>
     </div>
-    <div class="onboarding-step hidden" data-step="1">
+    <div class="onboarding-step hidden" data-step="2">
       <div class="onboarding-icon-wrap" style="color: var(--pink);">
         <svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" fill="currentColor"/><circle cx="12" cy="9" r="2.7" fill="#15101a"/></svg>
       </div>
-      <h2>Marque quem você já foi</h2>
+      <h2>Marque os bares que você já foi</h2>
       <p>Toque no pin pra marcar os bares que você já visitou e acompanhar seu progresso.</p>
     </div>
-    <div class="onboarding-step hidden" data-step="2">
+    <div class="onboarding-step hidden" data-step="3">
       <div class="onboarding-icon-wrap" style="color: var(--blue);">
         <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4.5L6 20V5a1 1 0 0 1 1-1z"/></svg>
       </div>
-      <h2>Guarde pra ir em breve</h2>
+      <h2>Salve os bares que você quer ir em breve</h2>
       <p>Toque no marcador pra guardar os bares que você ainda quer conhecer.</p>
     </div>
-    <div class="onboarding-step hidden" data-step="3">
+    <div class="onboarding-step hidden" data-step="4">
       <div class="onboarding-icon-wrap" style="color: var(--magenta);">
         <span class="onboarding-heart">♥</span>
       </div>
@@ -749,8 +772,12 @@
       <span data-dot="1"></span>
       <span data-dot="2"></span>
       <span data-dot="3"></span>
+      <span data-dot="4"></span>
     </div>
-    <button type="button" id="onboardingNextBtn">Próximo</button>
+    <div class="onboarding-actions">
+      <button type="button" id="onboardingBackBtn" class="onboarding-back-btn hidden">Voltar</button>
+      <button type="button" id="onboardingNextBtn">Próximo</button>
+    </div>
   </div>
 </div>
 <div id="aiRecommendOverlay" class="cadastro-overlay hidden">
@@ -1358,6 +1385,7 @@
   const gateEl = document.getElementById('gate');
   const gateForm = document.getElementById('gateForm');
   const gatePassword = document.getElementById('gatePassword');
+  const gateMaior18 = document.getElementById('gateMaior18');
   const passwordError = document.getElementById('passwordError');
 
   function grantBypass() {
@@ -1377,6 +1405,7 @@
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const onboardingClose = document.getElementById('onboardingClose');
   const onboardingNextBtn = document.getElementById('onboardingNextBtn');
+  const onboardingBackBtn = document.getElementById('onboardingBackBtn');
   const onboardingSteps = onboardingOverlay.querySelectorAll('.onboarding-step');
   const onboardingDots = onboardingOverlay.querySelectorAll('.onboarding-dots span');
   let onboardingStep = 0;
@@ -1385,6 +1414,7 @@
     onboardingSteps.forEach((el, i) => el.classList.toggle('hidden', i !== onboardingStep));
     onboardingDots.forEach((el, i) => el.classList.toggle('active', i === onboardingStep));
     onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? 'Entendi' : 'Próximo';
+    onboardingBackBtn.classList.toggle('hidden', onboardingStep === 0);
   }
 
   function closeOnboarding() {
@@ -1413,6 +1443,11 @@
     onboardingStep++;
     renderOnboardingStep();
   });
+  onboardingBackBtn.addEventListener('click', () => {
+    if (onboardingStep === 0) return;
+    onboardingStep--;
+    renderOnboardingStep();
+  });
   onboardingClose.addEventListener('click', () => {
     if (window.trackEvent) window.trackEvent('onboarding_skip', { step: onboardingStep });
     closeOnboarding();
@@ -1420,6 +1455,10 @@
 
   gateForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!gateMaior18.checked) {
+      passwordError.textContent = 'Confirme que você é maior de 18 anos para continuar.';
+      return;
+    }
     if (gatePassword.value === BYPASS_PASSWORD) {
       passwordError.textContent = '';
       grantBypass();
