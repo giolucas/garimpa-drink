@@ -46,7 +46,6 @@ const BARES = [
   { visitado: true, bar: "Belle Epoque", instagram: "https://www.instagram.com/belle_epoquesp", bairro: "Pinheiros", estilo: "Bar Balcão" },
   { visitado: true, bar: "Fifty Fifty Bar", instagram: "https://www.instagram.com/fiftyfifty.bar", bairro: "Pinheiros", estilo: "Bar Balcão" },
   { visitado: true, bar: "SubAstor - Pinheiros", instagram: "https://www.instagram.com/subastor", bairro: "Pinheiros", estilo: "Alta Coquetelaria" },
-  { visitado: false, bar: "Alba São Paulo (Vila Beatriz)", instagram: "", bairro: "Pinheiros", estilo: "Restaurante" },
   { visitado: false, bar: "Baretto", instagram: "https://www.instagram.com/fasanosaopaulo", bairro: "Jardins", estilo: "" },
   { visitado: false, bar: "Shiro Cocktail", instagram: "https://www.instagram.com/shirococktailbar", bairro: "Jardins", estilo: "" },
   { visitado: false, bar: "Il Covo", instagram: "https://www.instagram.com/ilcovobar", bairro: "Jardins", estilo: "Speakeasy" },
