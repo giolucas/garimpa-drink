@@ -504,6 +504,33 @@
     width: auto;
     margin: 2px 0 0;
   }
+  .onboarding-icon-wrap {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .onboarding-heart {
+    font-size: 30px;
+    line-height: 1;
+  }
+  .onboarding-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 16px 0 14px;
+  }
+  .onboarding-dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #3a2e38;
+  }
+  .onboarding-dots span.active { background: var(--accent); }
   .detail-overlay {
     position: fixed;
     inset: 0;
@@ -680,6 +707,46 @@
       <div class="gate-error" id="forgotError"></div>
       <p class="cadastro-switch"><a href="#" id="backToLoginFromForgot">Voltar</a></p>
     </div>
+  </div>
+</div>
+<div id="onboardingOverlay" class="cadastro-overlay hidden">
+  <div class="gate-box">
+    <button type="button" class="cadastro-close" id="onboardingClose" aria-label="Fechar">&times;</button>
+    <div class="onboarding-step" data-step="0">
+      <div class="onboarding-icon-wrap" style="color: var(--accent);">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <h2>Veja o Instagram do bar</h2>
+      <p>Toque no ícone do Instagram em qualquer card pra abrir o perfil do bar direto no app.</p>
+    </div>
+    <div class="onboarding-step hidden" data-step="1">
+      <div class="onboarding-icon-wrap" style="color: var(--pink);">
+        <svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" fill="currentColor"/><circle cx="12" cy="9" r="2.7" fill="#15101a"/></svg>
+      </div>
+      <h2>Marque quem você já foi</h2>
+      <p>Toque no pin pra marcar os bares que você já visitou e acompanhar seu progresso.</p>
+    </div>
+    <div class="onboarding-step hidden" data-step="2">
+      <div class="onboarding-icon-wrap" style="color: var(--blue);">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4.5L6 20V5a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <h2>Guarde pra ir em breve</h2>
+      <p>Toque no marcador pra guardar os bares que você ainda quer conhecer.</p>
+    </div>
+    <div class="onboarding-step hidden" data-step="3">
+      <div class="onboarding-icon-wrap" style="color: var(--magenta);">
+        <span class="onboarding-heart">♥</span>
+      </div>
+      <h2>Favorite seus preferidos</h2>
+      <p>Toque no coração pra favoritar os bares que você mais ama.</p>
+    </div>
+    <div class="onboarding-dots">
+      <span class="active" data-dot="0"></span>
+      <span data-dot="1"></span>
+      <span data-dot="2"></span>
+      <span data-dot="3"></span>
+    </div>
+    <button type="button" id="onboardingNextBtn">Próximo</button>
   </div>
 </div>
 <div id="aiRecommendOverlay" class="cadastro-overlay hidden">
@@ -1301,15 +1368,57 @@
     gateEl.classList.add('hidden');
   }
 
+  const ONBOARDING_KEY = 'garimpa_onboarding_seen';
+  const onboardingOverlay = document.getElementById('onboardingOverlay');
+  const onboardingClose = document.getElementById('onboardingClose');
+  const onboardingNextBtn = document.getElementById('onboardingNextBtn');
+  const onboardingSteps = onboardingOverlay.querySelectorAll('.onboarding-step');
+  const onboardingDots = onboardingOverlay.querySelectorAll('.onboarding-dots span');
+  let onboardingStep = 0;
+
+  function renderOnboardingStep() {
+    onboardingSteps.forEach((el, i) => el.classList.toggle('hidden', i !== onboardingStep));
+    onboardingDots.forEach((el, i) => el.classList.toggle('active', i === onboardingStep));
+    onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? 'Entendi' : 'Próximo';
+  }
+
+  function closeOnboarding() {
+    localStorage.setItem(ONBOARDING_KEY, 'ok');
+    onboardingOverlay.classList.add('hidden');
+  }
+
+  function showOnboarding() {
+    if (localStorage.getItem(ONBOARDING_KEY) === 'ok') return;
+    onboardingStep = 0;
+    renderOnboardingStep();
+    onboardingOverlay.classList.remove('hidden');
+  }
+
+  onboardingNextBtn.addEventListener('click', () => {
+    if (onboardingStep === onboardingSteps.length - 1) {
+      if (window.trackEvent) window.trackEvent('onboarding_complete');
+      closeOnboarding();
+      return;
+    }
+    onboardingStep++;
+    renderOnboardingStep();
+  });
+  onboardingClose.addEventListener('click', () => {
+    if (window.trackEvent) window.trackEvent('onboarding_skip', { step: onboardingStep });
+    closeOnboarding();
+  });
+
   gateForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (gatePassword.value === BYPASS_PASSWORD) {
       passwordError.textContent = '';
       grantBypass();
+      showOnboarding();
     } else if (gatePassword.value === GATE_PASSWORD) {
       localStorage.setItem(GATE_KEY, 'ok');
       passwordError.textContent = '';
       gateEl.classList.add('hidden');
+      showOnboarding();
     } else {
       passwordError.textContent = 'Senha incorreta. Tente novamente.';
       gatePassword.value = '';
