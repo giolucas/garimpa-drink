@@ -40,7 +40,7 @@
     padding-bottom: 40px;
   }
   header {
-    padding: 36px 16px 16px;
+    padding: 16px 16px;
     position: sticky;
     top: 0;
     background: var(--bg);
@@ -383,20 +383,24 @@
     margin-top: 10px;
     min-height: 16px;
   }
-  header { position: relative; }
-  .account-bar {
-    position: absolute;
-    top: 16px;
-    right: 16px;
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .account-bar { z-index: 20; }
+  .header-top-actions {
     z-index: 20;
+    display: flex;
+    gap: 6px;
   }
-  .how-to-start-btn {
-    display: block;
-    margin: 10px auto 0;
-  }
-  .ranking-btn {
-    display: block;
-    margin: 8px auto 0;
+  .header-top-actions button {
+    padding: 6px 10px;
+    font-size: 11.5px;
+    white-space: nowrap;
   }
   .ranking-box {
     max-width: 360px;
@@ -871,12 +875,18 @@
   </div>
 </div>
 <header>
+  <div class="header-top-row">
+    <div class="header-top-actions">
+      <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
+      <button type="button" class="account-login-btn" id="rankingBtn">Ranking dos bares</button>
+    </div>
+    <div class="account-bar" id="accountBar"></div>
+  </div>
   <div class="brand">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
   <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
-  <div class="account-bar" id="accountBar"></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -889,8 +899,6 @@
     <div class="toggle-btn" data-val="embreve">Ir em Breve</div>
   </div>
   <button type="button" class="ai-recommend-btn" id="aiRecommendBtn">Me indique um bar de drink</button>
-  <button type="button" class="account-login-btn how-to-start-btn" id="howToStartBtn">Como começar</button>
-  <button type="button" class="account-login-btn ranking-btn" id="rankingBtn">Ranking dos bares</button>
 </header>
 <main>
   <div class="count" id="count"></div>
