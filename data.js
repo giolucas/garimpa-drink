@@ -4,7 +4,7 @@ const BARES = [
   { visitado: true, bar: "Fel", instagram: "https://www.instagram.com/fel.sp", bairro: "Centro / República", estilo: "Alta Coquetelaria" },
   { visitado: true, bar: "Cordial", instagram: "https://www.instagram.com/_cordial_sp", bairro: "Centro / República", estilo: "Bar Boteco" },
   { visitado: false, bar: "Trópico", instagram: "https://www.instagram.com/tropico.sp", bairro: "Centro / República", estilo: "Listening Bar" },
-  { visitado: true, bar: "Lágrima", instagram: "https://www.instagram.com/lagrima.bar", bairro: "Centro / República", estilo: "Bar Balcão" },
+  { visitado: true, bar: "Lágrima", instagram: "https://www.instagram.com/lagrima.bar", bairro: "Centro / República", estilo: "Bar Balcão", novidadePost: "https://www.instagram.com/p/DaOZtFBv4ki/" },
   { visitado: true, bar: "Matiz", instagram: "https://www.instagram.com/matizbarsp", bairro: "Centro / República", estilo: "Listening Bar" },
   { visitado: true, bar: "Dentro Bar", instagram: "https://www.instagram.com/dentrobarsp", bairro: "Centro / República", estilo: "Bar Boteco" },
   { visitado: true, bar: "Infini Bar", instagram: "https://www.instagram.com/infini.bar", bairro: "Centro / República", estilo: "Speakeasy" },
