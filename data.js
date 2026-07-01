@@ -34,7 +34,7 @@ const BARES = [
   { visitado: true, bar: "Sala Bar", instagram: "https://www.instagram.com/salabarsp", bairro: "Pinheiros", estilo: "Bar Balada" },
   { visitado: true, bar: "Boca de Ouro", instagram: "https://www.instagram.com/barbocadeouro", bairro: "Pinheiros", estilo: "Bar Balcão" },
   { visitado: true, bar: "Caledonia", instagram: "https://www.instagram.com/caledoniabar", bairro: "Pinheiros", estilo: "Alta Coquetelaria" },
-  { visitado: true, bar: "Trinca Bar", instagram: "https://www.instagram.com/trincabar", bairro: "Pinheiros", estilo: "Bar Balcão" },
+  { visitado: true, bar: "Trinca Bar", instagram: "https://www.instagram.com/trincabar", bairro: "Pinheiros", estilo: "Bar Balcão", novidadePost: "https://www.instagram.com/p/DaQ-wGOHGM9/" },
   { visitado: false, bar: "The Door Bar", instagram: "https://www.instagram.com/thedoor.bar", bairro: "Pinheiros", estilo: "Bar Balcão" },
   { visitado: false, bar: "CRN 932", instagram: "https://www.instagram.com/crn.932", bairro: "Pinheiros", estilo: "Restaurante" },
   { visitado: true, bar: "Picco", instagram: "https://www.instagram.com/o.picco", bairro: "Pinheiros", estilo: "Bar Balcão" },
