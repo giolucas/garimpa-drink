@@ -750,27 +750,16 @@
       <form id="cadastroForm">
         <input type="text" id="cadastroNome" placeholder="Seu nome" autocomplete="name">
         <input type="email" id="cadastroEmail" placeholder="Seu email" autocomplete="email">
+        <input type="password" id="cadastroSenha" placeholder="Senha (mín. 6 caracteres)" autocomplete="new-password">
+        <input type="password" id="cadastroSenhaConfirm" placeholder="Confirme a senha" autocomplete="new-password">
         <label class="cadastro-check">
           <input type="checkbox" id="cadastroMaior18">
           Declaro que sou maior de 18 anos.
         </label>
-        <button type="submit">Continuar</button>
+        <button type="submit">Criar conta</button>
       </form>
       <div class="gate-error" id="cadastroError"></div>
       <p class="cadastro-switch">Já tem cadastro? <a href="#" id="showLoginLink">Entrar com email e senha</a></p>
-    </div>
-    <div id="cadastroCheckEmailBlock" class="hidden">
-      <p id="cadastroCheckEmailText">Enviamos um link de confirmação para o seu email. Abra-o e clique no link para continuar.</p>
-      <div class="gate-error" id="checkEmailError"></div>
-      <p class="cadastro-switch"><a href="#" id="backToCadastroFromCheck">Voltar</a></p>
-    </div>
-    <div id="cadastroConfirmEmailBlock" class="hidden">
-      <p>Confirme seu email para continuar (você abriu o link em um app diferente do que usou para se cadastrar).</p>
-      <form id="confirmEmailForm">
-        <input type="email" id="confirmEmailInput" placeholder="Seu email" autocomplete="email">
-        <button type="submit">Confirmar</button>
-      </form>
-      <div class="gate-error" id="confirmEmailError"></div>
     </div>
     <div id="cadastroPasswordBlock" class="hidden">
       <p id="passwordSetIntro">Email confirmado! Agora crie uma senha de acesso.</p>
@@ -947,9 +936,8 @@
   import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
   import {
-    getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
-    updatePassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
-    verifyPasswordResetCode, confirmPasswordReset
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+    sendPasswordResetEmail, verifyPasswordResetCode, confirmPasswordReset
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -966,10 +954,6 @@
   const db = getFirestore(firebaseApp);
   const analytics = getAnalytics(firebaseApp);
   const auth = getAuth(firebaseApp);
-  const actionCodeSettings = {
-    url: window.location.origin + window.location.pathname,
-    handleCodeInApp: true,
-  };
 
   function withTimeout(promise, ms = 15000) {
     let timer;
@@ -994,25 +978,17 @@
   };
 
   const REG_KEY = 'garimpa_cadastro';
-  const PENDING_KEY = 'garimpa_pendente_cadastro';
-  const EMAIL_FOR_SIGNIN_KEY = 'garimpa_email_signin';
   const accountBar = document.getElementById('accountBar');
   const cadastroOverlay = document.getElementById('cadastroOverlay');
   const cadastroForm = document.getElementById('cadastroForm');
   const cadastroNome = document.getElementById('cadastroNome');
   const cadastroEmail = document.getElementById('cadastroEmail');
+  const cadastroSenha = document.getElementById('cadastroSenha');
+  const cadastroSenhaConfirm = document.getElementById('cadastroSenhaConfirm');
   const cadastroMaior18 = document.getElementById('cadastroMaior18');
   const cadastroError = document.getElementById('cadastroError');
   const cadastroClose = document.getElementById('cadastroClose');
   const cadastroRegisterBlock = document.getElementById('cadastroRegisterBlock');
-  const cadastroCheckEmailBlock = document.getElementById('cadastroCheckEmailBlock');
-  const cadastroCheckEmailText = document.getElementById('cadastroCheckEmailText');
-  const checkEmailError = document.getElementById('checkEmailError');
-  const backToCadastroFromCheck = document.getElementById('backToCadastroFromCheck');
-  const cadastroConfirmEmailBlock = document.getElementById('cadastroConfirmEmailBlock');
-  const confirmEmailForm = document.getElementById('confirmEmailForm');
-  const confirmEmailInput = document.getElementById('confirmEmailInput');
-  const confirmEmailError = document.getElementById('confirmEmailError');
   const cadastroPasswordBlock = document.getElementById('cadastroPasswordBlock');
   const passwordSetIntro = document.getElementById('passwordSetIntro');
   const passwordSetForm = document.getElementById('passwordSetForm');
@@ -1033,16 +1009,7 @@
   const forgotError = document.getElementById('forgotError');
   const backToLoginFromForgot = document.getElementById('backToLoginFromForgot');
   let pendingAuthEmail = null;
-  let pendingAuthNome = null;
   let resetOobCode = null;
-
-  function buildSignInUrl(extraParams) {
-    const url = new URL(window.location.origin + window.location.pathname);
-    for (const key in extraParams) {
-      if (extraParams[key]) url.searchParams.set(key, extraParams[key]);
-    }
-    return url.toString();
-  }
 
   function loadRegistration() {
     try {
@@ -1105,8 +1072,6 @@
 
   const cadastroBlocks = {
     register: cadastroRegisterBlock,
-    checkEmail: cadastroCheckEmailBlock,
-    confirmEmail: cadastroConfirmEmailBlock,
     password: cadastroPasswordBlock,
     login: cadastroLoginBlock,
     forgot: cadastroForgotBlock,
@@ -1117,8 +1082,6 @@
       cadastroBlocks[key].classList.toggle('hidden', key !== name);
     }
     cadastroError.textContent = '';
-    checkEmailError.textContent = '';
-    confirmEmailError.textContent = '';
     passwordSetError.textContent = '';
     loginError.textContent = '';
     forgotError.textContent = '';
@@ -1147,11 +1110,6 @@
   backToLoginFromForgot.addEventListener('click', (e) => {
     e.preventDefault();
     showBlock('login');
-  });
-
-  backToCadastroFromCheck.addEventListener('click', (e) => {
-    e.preventDefault();
-    showBlock('register');
   });
 
   loginForm.addEventListener('submit', async (e) => {
@@ -1196,7 +1154,7 @@
     }
     forgotError.textContent = 'Enviando...';
     try {
-      await withTimeout(sendPasswordResetEmail(auth, email, actionCodeSettings));
+      await withTimeout(sendPasswordResetEmail(auth, email));
       forgotError.textContent = `Enviamos um link de redefinição de senha para ${email}. Confira sua caixa de entrada.`;
       window.trackEvent('senha_esquecida_link_enviado');
     } catch (err) {
@@ -1209,6 +1167,8 @@
     e.preventDefault();
     const nome = cadastroNome.value.trim();
     const email = cadastroEmail.value.trim().toLowerCase();
+    const senha = cadastroSenha.value;
+    const senhaConfirm = cadastroSenhaConfirm.value;
     const maior18 = cadastroMaior18.checked;
     if (!nome || !email) {
       cadastroError.textContent = 'Preencha nome e email.';
@@ -1218,22 +1178,37 @@
       cadastroError.textContent = 'Email inválido.';
       return;
     }
+    if (!senha || senha.length < 6) {
+      cadastroError.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      return;
+    }
+    if (senha !== senhaConfirm) {
+      cadastroError.textContent = 'As senhas não coincidem.';
+      return;
+    }
     if (!maior18) {
       cadastroError.textContent = 'É preciso declarar que é maior de 18 anos.';
       return;
     }
-    cadastroError.textContent = 'Enviando link de confirmação...';
+    cadastroError.textContent = 'Criando conta...';
     try {
-      const settings = { url: buildSignInUrl({ nome, email }), handleCodeInApp: true };
-      await withTimeout(sendSignInLinkToEmail(auth, email, settings));
-      localStorage.setItem(PENDING_KEY, JSON.stringify({ nome, email, maior18: true }));
-      localStorage.setItem(EMAIL_FOR_SIGNIN_KEY, email);
-      cadastroCheckEmailText.textContent = `Enviamos um link de confirmação para ${email}. Abra-o e clique no link para continuar.`;
-      showBlock('checkEmail');
-      window.trackEvent('cadastro_link_enviado');
+      await withTimeout(createUserWithEmailAndPassword(auth, email, senha));
+      await withTimeout(setDoc(doc(db, 'users', email), {
+        nome, email, maior18: true, updatedAt: Date.now()
+      }, { merge: true }));
+      currentReg = { nome, email, maior18: true };
+      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
+      cadastroOverlay.classList.add('hidden');
+      renderAccountBar();
+      window.trackEvent('cadastro_concluido');
+      await loadFromCloud(email);
     } catch (err) {
-      console.error('Erro ao enviar link de confirmação', err);
-      cadastroError.textContent = `Não foi possível enviar o email (${describeError(err)}). Tente novamente.`;
+      console.error('Erro ao criar conta', err);
+      if (err.code === 'auth/email-already-in-use') {
+        cadastroError.textContent = 'Este email já está cadastrado. Tente entrar.';
+      } else {
+        cadastroError.textContent = `Erro ao criar conta (${describeError(err)}). Tente novamente.`;
+      }
     }
   });
 
@@ -1249,108 +1224,34 @@
       passwordSetError.textContent = 'As senhas não coincidem.';
       return;
     }
-    if (resetOobCode) {
-      passwordSetError.textContent = 'Salvando...';
-      const oobCode = resetOobCode;
-      const email = pendingAuthEmail;
-      try {
-        await withTimeout(confirmPasswordReset(auth, oobCode, pass));
-      } catch (err) {
-        console.error('Erro ao redefinir senha (confirmPasswordReset)', err);
-        passwordSetError.textContent = `Erro ao redefinir senha (${describeError(err)}). Tente novamente.`;
-        return;
-      }
-      resetOobCode = null;
-      try {
-        await withTimeout(signInWithEmailAndPassword(auth, email, pass));
-      } catch (err) {
-        console.error('Erro ao entrar após redefinir senha', err);
-      }
-      const snap = await withTimeout(getDoc(doc(db, 'users', email))).catch(() => null);
-      const nome = snap && snap.exists() ? (snap.data().nome || '') : '';
-      currentReg = { nome, email, maior18: true };
-      localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
-      cadastroOverlay.classList.add('hidden');
-      renderAccountBar();
-      window.trackEvent('senha_redefinida');
-      await loadFromCloud(email);
-      return;
-    }
-    if (!auth.currentUser) {
-      passwordSetError.textContent = 'Sessão de confirmação expirou. Volte e clique no link do email novamente.';
+    if (!resetOobCode) {
+      passwordSetError.textContent = 'Sessão expirou. Solicite a redefinição novamente.';
       return;
     }
     passwordSetError.textContent = 'Salvando...';
+    const oobCode = resetOobCode;
+    const email = pendingAuthEmail;
     try {
-      await withTimeout(updatePassword(auth.currentUser, pass));
+      await withTimeout(confirmPasswordReset(auth, oobCode, pass));
     } catch (err) {
-      console.error('Erro ao criar senha (updatePassword)', err);
-      passwordSetError.textContent = `Erro ao criar senha (${describeError(err)}). Tente novamente.`;
+      console.error('Erro ao redefinir senha (confirmPasswordReset)', err);
+      passwordSetError.textContent = `Erro ao redefinir senha (${describeError(err)}). Tente novamente.`;
       return;
     }
-    const pendingRaw = localStorage.getItem(PENDING_KEY);
-    const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
-    const email = pendingAuthEmail || (pending && pending.email) || auth.currentUser.email;
-    const nome = (pending && pending.nome) || pendingAuthNome || '';
+    resetOobCode = null;
+    try {
+      await withTimeout(signInWithEmailAndPassword(auth, email, pass));
+    } catch (err) {
+      console.error('Erro ao entrar após redefinir senha', err);
+    }
+    const snap = await withTimeout(getDoc(doc(db, 'users', email))).catch(() => null);
+    const nome = snap && snap.exists() ? (snap.data().nome || '') : '';
     currentReg = { nome, email, maior18: true };
     localStorage.setItem(REG_KEY, JSON.stringify(currentReg));
-    localStorage.removeItem(PENDING_KEY);
-    try {
-      await withTimeout(setDoc(doc(db, 'users', email), {
-        nome, email, maior18: true, emailVerified: true, updatedAt: Date.now()
-      }, { merge: true }));
-    } catch (err) {
-      console.error('Erro ao salvar cadastro (setDoc)', err);
-      passwordSetError.textContent = `Senha criada, mas houve um erro ao salvar o cadastro (${describeError(err)}).`;
-      return;
-    }
     cadastroOverlay.classList.add('hidden');
     renderAccountBar();
-    window.trackEvent('cadastro_concluido');
+    window.trackEvent('senha_redefinida');
     await loadFromCloud(email);
-  });
-
-  async function completeEmailLinkSignIn(email, nome) {
-    const href = window.location.href;
-    try {
-      await withTimeout(signInWithEmailLink(auth, email, href));
-      window.history.replaceState({}, document.title, window.location.pathname);
-      localStorage.removeItem(EMAIL_FOR_SIGNIN_KEY);
-      pendingAuthEmail = email;
-      pendingAuthNome = nome || pendingAuthNome;
-      passwordSetIntro.textContent = 'Email confirmado! Agora crie uma senha de acesso.';
-      showBlock('password');
-      cadastroOverlay.classList.remove('hidden');
-    } catch (err) {
-      console.error('Erro ao confirmar email', err);
-      checkEmailError.textContent = `Link inválido ou expirado (${describeError(err)}). Faça o cadastro novamente.`;
-      showBlock('checkEmail');
-      cadastroOverlay.classList.remove('hidden');
-    }
-  }
-
-  async function handleEmailLinkSignIn() {
-    if (!isSignInWithEmailLink(auth, window.location.href)) return;
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get('email') || localStorage.getItem(EMAIL_FOR_SIGNIN_KEY);
-    const nome = params.get('nome');
-    if (!email) {
-      showBlock('confirmEmail');
-      cadastroOverlay.classList.remove('hidden');
-      return;
-    }
-    await completeEmailLinkSignIn(email, nome);
-  }
-
-  confirmEmailForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = confirmEmailInput.value.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      confirmEmailError.textContent = 'Email inválido.';
-      return;
-    }
-    confirmEmailError.textContent = 'Confirmando...';
-    await completeEmailLinkSignIn(email);
   });
 
   async function handlePasswordResetLink() {
@@ -1415,7 +1316,6 @@
   if (currentReg) {
     loadFromCloud(currentReg.email);
   }
-  handleEmailLinkSignIn();
   handlePasswordResetLink();
   window.syncToCloud = syncToCloud;
 
