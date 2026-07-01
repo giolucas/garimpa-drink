@@ -711,8 +711,34 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px 10px;
+    margin-bottom: 14px;
+  }
+  .detail-icon-row {
+    display: flex;
+    gap: 8px;
     margin-bottom: 16px;
   }
+  .detail-icon-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 4px;
+    border-radius: 12px;
+    border: none;
+    background: #1c1c1e;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.12s;
+  }
+  .detail-icon-btn:active { transform: scale(0.92); }
+  .detail-icon-btn.ig-active { color: var(--magenta); }
+  .detail-icon-btn.pin-active { color: #e23b3b; }
+  .detail-icon-btn.bookmark-active { color: var(--blue); }
+  .detail-icon-btn.heart-active { color: var(--magenta); }
   .detail-actions {
     display: flex;
     gap: 10px;
@@ -959,6 +985,7 @@
     <button class="detail-close" id="detailClose" aria-label="Fechar">✕</button>
     <h2 class="detail-bar-name" id="detailBarName"></h2>
     <div class="detail-meta" id="detailMeta"></div>
+    <div class="detail-icon-row" id="detailIconRow"></div>
     <div class="detail-actions">
       <button class="detail-action-btn" id="detailReservarBtn">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1690,11 +1717,65 @@
   const detailClose = document.getElementById('detailClose');
   const detailBarName = document.getElementById('detailBarName');
   const detailMeta = document.getElementById('detailMeta');
+  const detailIconRow = document.getElementById('detailIconRow');
   const detailReservarBtn = document.getElementById('detailReservarBtn');
   const detailOfertaBtn = document.getElementById('detailOfertaBtn');
   const menuClassicos = document.getElementById('menuClassicos');
   const menuAutorais = document.getElementById('menuAutorais');
   let detailBar = null;
+
+  function renderDetailIcons() {
+    if (!detailBar) return;
+    const b = detailBar;
+    const isVisitado = visitados.has(b._id);
+    const isEmbreve = embreve.has(b._id);
+    const isFav = favoritos.has(b._id);
+    const hasIg = !!b.instagram;
+    detailIconRow.innerHTML = `
+      <button class="detail-icon-btn${hasIg ? ' ig-active' : ''}" id="detailIgBtn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        Instagram
+      </button>
+      <button class="detail-icon-btn${isVisitado ? ' pin-active' : ''}" id="detailPinBtn">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" fill="currentColor"/><circle cx="12" cy="9" r="2.7" fill="#fff"/></svg>
+        Visitei
+      </button>
+      <button class="detail-icon-btn${isEmbreve ? ' bookmark-active' : ''}" id="detailEmbreveBtn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="${isEmbreve ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="${bookmarkIconPath}"/>
+        </svg>
+        Em Breve
+      </button>
+      <button class="detail-icon-btn${isFav ? ' heart-active' : ''}" id="detailHeartBtn">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Favorito
+      </button>
+    `;
+    document.getElementById('detailIgBtn').addEventListener('click', () => {
+      if (hasIg) {
+        if (window.trackEvent) window.trackEvent('click_instagram', { bar_name: b.bar });
+        window.open(b.instagram, '_blank', 'noopener');
+      }
+    });
+    document.getElementById('detailPinBtn').addEventListener('click', () => {
+      toggleVisitado(b._id);
+      renderDetailIcons();
+    });
+    document.getElementById('detailEmbreveBtn').addEventListener('click', () => {
+      toggleEmbreve(b._id);
+      renderDetailIcons();
+    });
+    document.getElementById('detailHeartBtn').addEventListener('click', () => {
+      toggleFavorito(b._id);
+      renderDetailIcons();
+    });
+  }
 
   function renderDrinkList(container, drinks, barId, categoria) {
     if (!drinks || drinks.length === 0) {
@@ -1745,6 +1826,7 @@
         render();
       });
     });
+    renderDetailIcons();
     renderMenuLists();
     barDetail.classList.remove('hidden');
     if (window.trackEvent) window.trackEvent('view_bar_detail', { bar_name: b.bar, bairro: b.bairro || '', estilo: b.estilo || '' });
