@@ -40,16 +40,12 @@
     padding-bottom: 40px;
   }
   header {
-    padding: 12px 16px 10px;
+    padding: 16px 16px;
     position: sticky;
     top: 0;
     background: var(--bg);
     z-index: 10;
     border-bottom: 1px solid #2e2430;
-  }
-  .page-intro {
-    padding: 20px 16px 4px;
-    text-align: center;
   }
   .brand {
     display: flex;
@@ -886,6 +882,11 @@
     </div>
     <div class="account-bar" id="accountBar"></div>
   </div>
+  <div class="brand">
+    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <h1>Garimpa Drink</h1>
+  </div>
+  <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -897,15 +898,8 @@
     <div class="toggle-btn" data-val="visited">Visitados</div>
     <div class="toggle-btn" data-val="embreve">Ir em Breve</div>
   </div>
-</header>
-<div class="page-intro">
-  <div class="brand">
-    <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
-    <h1>Garimpa Drink</h1>
-  </div>
-  <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
   <button type="button" class="ai-recommend-btn" id="aiRecommendBtn">Me indique um bar de drink</button>
-</div>
+</header>
 <main>
   <div class="count" id="count"></div>
   <div id="list"></div>
