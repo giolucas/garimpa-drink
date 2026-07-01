@@ -415,11 +415,50 @@
     border-color: var(--magenta);
     color: #fff;
   }
-  .ranking-box {
-    max-width: 360px;
-    text-align: left;
+  .ranking-page { display: none; }
+  .ranking-page:not(.hidden) {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    background: var(--bg);
+    overflow-y: auto;
   }
-  .ranking-box h2 { text-align: center; }
+  .ranking-page-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+  }
+  .ranking-page-topbar {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #2e2430;
+    margin-bottom: 20px;
+  }
+  .ranking-back-btn {
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--magenta);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .ranking-page-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .ranking-desc {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
   .ranking-tabs {
     display: flex;
     gap: 6px;
@@ -446,24 +485,27 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 320px;
-    overflow-y: auto;
   }
   .ranking-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 10px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
     background: #1c1c1e;
+    cursor: pointer;
+    border: 1px solid #2e2430;
+    transition: border-color 0.15s;
   }
+  .ranking-item:active { border-color: var(--magenta); }
   .ranking-rank {
     font-weight: 800;
     color: var(--accent);
-    min-width: 22px;
+    min-width: 24px;
+    font-size: 14px;
   }
-  .ranking-name { flex: 1; font-size: 13.5px; }
-  .ranking-count { font-size: 12px; color: var(--muted); }
+  .ranking-name { flex: 1; font-size: 14px; font-weight: 500; }
+  .ranking-arrow { color: var(--muted); font-size: 18px; }
   .ranking-empty {
     text-align: center;
     color: var(--muted);
@@ -864,14 +906,17 @@
     </div>
   </div>
 </div>
-<div id="rankingOverlay" class="cadastro-overlay hidden">
-  <div class="gate-box ranking-box">
-    <button type="button" class="cadastro-close" id="rankingClose" aria-label="Fechar">&times;</button>
-    <h2>Ranking dos bares</h2>
+<div id="rankingPage" class="ranking-page hidden">
+  <div class="ranking-page-inner">
+    <div class="ranking-page-topbar">
+      <button type="button" id="rankingClose" class="ranking-back-btn">← Voltar</button>
+    </div>
+    <h2 class="ranking-page-title">Ranking dos bares</h2>
+    <p class="ranking-desc">Aqui você vai ver os bares mais bem rankeados nas categorias abaixo, baseado na interação dos usuários do app. (em breve)</p>
     <div class="ranking-tabs">
-      <div class="ranking-tab active" data-field="visitados">Mais visitados</div>
-      <div class="ranking-tab" data-field="favoritos">Mais favoritados</div>
-      <div class="ranking-tab" data-field="embreve">Mais ir em breve</div>
+      <div class="ranking-tab active" data-field="favoritos">Favoritos</div>
+      <div class="ranking-tab" data-field="visitados">Visitados</div>
+      <div class="ranking-tab" data-field="embreve">Ir em Breve</div>
     </div>
     <div class="ranking-list" id="rankingList"></div>
   </div>
@@ -1455,34 +1500,34 @@
   });
 
   const rankingBtn = document.getElementById('rankingBtn');
-  const rankingOverlay = document.getElementById('rankingOverlay');
+  const rankingPage = document.getElementById('rankingPage');
   const rankingClose = document.getElementById('rankingClose');
   const rankingList = document.getElementById('rankingList');
-  const rankingTabs = rankingOverlay.querySelectorAll('.ranking-tab');
-  let rankingField = 'visitados';
-  let rankingStats = null;
+  const rankingTabs = rankingPage.querySelectorAll('.ranking-tab');
+  let rankingField = 'favoritos';
+
+  const RANKING_STATIC = {
+    favoritos: ['Regô', 'Picco', 'Fel', 'Guarita'],
+    visitados: ['Regô', 'Santana', 'Picco', 'Cordial', 'Fel'],
+    embreve: ['Dopa Bar', 'Matiz', 'Água e Biscoito', 'Bar dos Arcos'],
+  };
 
   function renderRanking() {
-    if (!rankingStats) {
-      rankingList.innerHTML = '<div class="ranking-empty">Carregando...</div>';
-      return;
-    }
-    const entries = Object.entries(rankingStats)
-      .map(([id, stat]) => ({ bar: stat.bar, count: stat[rankingField] || 0 }))
-      .filter((e) => e.count > 0)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-    if (entries.length === 0) {
-      rankingList.innerHTML = '<div class="ranking-empty">Ainda não há dados suficientes.</div>';
-      return;
-    }
-    rankingList.innerHTML = entries.map((e, i) => `
-      <div class="ranking-item">
+    const bars = RANKING_STATIC[rankingField] || [];
+    rankingList.innerHTML = bars.map((name, i) => `
+      <div class="ranking-item" data-bar-name="${name}">
         <span class="ranking-rank">${i + 1}º</span>
-        <span class="ranking-name">${e.bar || 'Bar'}</span>
-        <span class="ranking-count">${e.count}</span>
+        <span class="ranking-name">${name}</span>
+        <span class="ranking-arrow">›</span>
       </div>
     `).join('');
+    rankingList.querySelectorAll('.ranking-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const barName = item.dataset.barName;
+        const bar = data.find(b => b.bar && b.bar.trim() === barName.trim());
+        if (bar) openBarDetail(bar._id);
+      });
+    });
   }
 
   rankingTabs.forEach((tab) => {
@@ -1494,15 +1539,14 @@
     });
   });
 
-  rankingBtn.addEventListener('click', async () => {
+  rankingBtn.addEventListener('click', () => {
     if (window.trackEvent) window.trackEvent('ranking_open');
-    rankingOverlay.classList.remove('hidden');
-    rankingStats = null;
+    rankingField = 'favoritos';
+    rankingTabs.forEach(t => t.classList.toggle('active', t.dataset.field === 'favoritos'));
     renderRanking();
-    rankingStats = window.loadBarRanking ? await window.loadBarRanking() : {};
-    renderRanking();
+    rankingPage.classList.remove('hidden');
   });
-  rankingClose.addEventListener('click', () => rankingOverlay.classList.add('hidden'));
+  rankingClose.addEventListener('click', () => rankingPage.classList.add('hidden'));
 
   onboardingNextBtn.addEventListener('click', () => {
     if (onboardingStep === onboardingSteps.length - 1) {
