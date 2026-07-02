@@ -30,7 +30,7 @@ const BARES = [
   { visitado: true, bar: "Bar Luiiza", instagram: "https://www.instagram.com/luiizabar", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52528, lng: -46.66798 },
   { visitado: false, bar: "Joio Cocktail Bar", instagram: "https://www.instagram.com/joiococktailbar", bairro: "Barra Funda", estilo: "Bar Balcão", lat: -23.53161, lng: -46.6615 },
   { visitado: true, bar: "Duas Irmãs", instagram: "https://www.instagram.com/cervejariaduasirmas", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52214, lng: -46.66204 },
-  { visitado: true, bar: "Dopa Bar (em breve)", instagram: "https://www.instagram.com/dopabar.sp", bairro: "", estilo: "", lat: -23.55, lng: -46.633 },
+  { visitado: true, bar: "Dopa Bar (em breve)", instagram: "https://www.instagram.com/dopabar.sp", bairro: "", estilo: "", lat: -23.55, lng: -46.633, novidadePost: "https://www.instagram.com/p/DZBISvLIfaE/" },
   { visitado: true, bar: "Sala Bar", instagram: "https://www.instagram.com/salabarsp", bairro: "Pinheiros", estilo: "Bar Balada", lat: -23.5641, lng: -46.684 },
   { visitado: true, bar: "Boca de Ouro", instagram: "https://www.instagram.com/barbocadeouro", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56267, lng: -46.68706 },
   { visitado: true, bar: "Caledonia", instagram: "https://www.instagram.com/caledoniabar", bairro: "Pinheiros", estilo: "Alta Coquetelaria", lat: -23.56669, lng: -46.68527 },
