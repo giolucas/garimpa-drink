@@ -2098,6 +2098,7 @@
       visitedMode = btn.dataset.val;
       if (window.trackEvent) window.trackEvent('toggle_mode', { mode: visitedMode });
       render();
+      renderMapMarkers();
     });
   });
 
@@ -2130,6 +2131,9 @@
     mapMarkers = [];
     data.forEach(b => {
       if (b.lat == null || b.lng == null) return;
+      if (visitedMode === 'visited' && !visitados.has(b._id)) return;
+      if (visitedMode === 'embreve' && !embreve.has(b._id)) return;
+      if (visitedMode === 'favorites' && !favoritos.has(b._id)) return;
       let state = 'default';
       if (favoritos.has(b._id)) state = 'favorite';
       else if (visitados.has(b._id)) state = 'visited';
