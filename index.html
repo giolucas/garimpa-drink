@@ -2131,8 +2131,8 @@
     data.forEach(b => {
       if (b.lat == null || b.lng == null) return;
       let state = 'default';
-      if (visitados.has(b._id)) state = 'visited';
-      else if (favoritos.has(b._id)) state = 'favorite';
+      if (favoritos.has(b._id)) state = 'favorite';
+      else if (visitados.has(b._id)) state = 'visited';
       else if (embreve.has(b._id)) state = 'embreve';
       const m = L.marker([b.lat, b.lng], { icon: markerIcon(state), title: b.bar })
         .on('click', () => openBarDetail(b._id));
