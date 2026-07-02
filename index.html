@@ -1037,7 +1037,7 @@
     <div class="toggle-btn" data-val="favorites">Favoritos</div>
   </div>
   <button type="button" class="ai-recommend-btn" id="aiRecommendBtn">Me indique um bar de drink</button>
-  <button type="button" id="mapToggleBtn" class="map-toggle-btn">🗺 Ver mapa</button>
+  <button type="button" id="mapToggleBtn" class="map-toggle-btn">Ver mapa</button>
   <div id="barsMap" class="hidden"></div>
 </header>
 <main>
@@ -2162,13 +2162,13 @@
     mapOpen = !mapOpen;
     if (mapOpen) {
       barsMapEl.classList.remove('hidden');
-      mapToggleBtn.textContent = '🗺 Ocultar mapa';
+      mapToggleBtn.textContent = 'Ocultar mapa';
       mapToggleBtn.classList.add('open');
       initMap();
       setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 50);
     } else {
       barsMapEl.classList.add('hidden');
-      mapToggleBtn.textContent = '🗺 Ver mapa';
+      mapToggleBtn.textContent = 'Ver mapa';
       mapToggleBtn.classList.remove('open');
     }
   });
