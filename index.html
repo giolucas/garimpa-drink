@@ -31,6 +31,20 @@
     --muted: #ab93a5;
     --green: #5fae6e;
     --red: #c98a8a;
+    --border: #2e2430;
+    --border2: #3a2e38;
+    --placeholder: #4a3f47;
+    --pill-border: rgba(255,255,255,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #f7f2f5;
+    --card: #ffffff;
+    --text: #1a1020;
+    --muted: #6d5a68;
+    --border: #e0d5dd;
+    --border2: #d5cad3;
+    --placeholder: #9a8896;
+    --pill-border: rgba(0,0,0,0.18);
   }
   * { box-sizing: border-box; }
   body {
@@ -49,12 +63,12 @@
     padding: 0 16px;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #2e2430;
+    border-bottom: 1px solid var(--border);
   }
   header {
     padding: 16px 16px;
     background: var(--bg);
-    border-bottom: 1px solid #2e2430;
+    border-bottom: 1px solid var(--border);
   }
   .brand {
     display: flex;
@@ -129,8 +143,8 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #3a2e38;
-    background: #1c1c1e;
+    border: 1px solid var(--border2);
+    background: var(--card);
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
@@ -149,8 +163,8 @@
     min-width: 110px;
     padding: 8px 10px;
     border-radius: 8px;
-    border: 1px solid #3a2e38;
-    background: #1c1c1e;
+    border: 1px solid var(--border2);
+    background: var(--card);
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 13px;
@@ -165,12 +179,12 @@
     padding: 8px 6px;
     text-align: center;
     border-radius: 8px;
-    border: 1px solid #3a2e38;
+    border: 1px solid var(--border2);
     font-size: 12.5px;
     font-weight: 600;
     color: var(--muted);
     cursor: pointer;
-    background: #1c1c1e;
+    background: var(--card);
   }
   .toggle-btn.active {
     border-color: var(--magenta);
@@ -239,7 +253,7 @@
     margin-top: 10px;
     padding: 8px 14px;
     border-radius: 8px;
-    border: 1px solid #3a2e42;
+    border: 1px solid var(--border2);
     background: transparent;
     color: var(--muted);
     font-family: 'Open Sans', sans-serif;
@@ -260,7 +274,7 @@
     line-height: 1;
     cursor: pointer;
     padding: 2px 4px;
-    color: #4a3f47;
+    color: var(--placeholder);
     flex-shrink: 0;
     transition: transform 0.15s ease;
   }
@@ -273,7 +287,7 @@
     cursor: pointer;
     padding: 2px 4px;
     line-height: 1;
-    color: #4a3f47;
+    color: var(--placeholder);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -290,7 +304,7 @@
     cursor: pointer;
     padding: 2px 4px;
     line-height: 1;
-    color: #4a3f47;
+    color: var(--placeholder);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -311,7 +325,7 @@
     border-radius: 12px;
     padding: 14px 16px;
     margin-bottom: 10px;
-    border: 1px solid #2e2430;
+    border: 1px solid var(--border);
     cursor: pointer;
   }
   .card-top {
@@ -358,9 +372,9 @@
   }
   .estilo-pill {
     appearance: none;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--pill-border);
     background: transparent;
-    color: #fff;
+    color: var(--text);
     border-radius: 20px;
     padding: 3px 12px;
     font-size: 12.5px;
@@ -420,8 +434,8 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #3a2e38;
-    background: #1c1c1e;
+    border: 1px solid var(--border2);
+    background: var(--card);
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
@@ -433,8 +447,8 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #3a2e38;
-    background: #1c1c1e;
+    border: 1px solid var(--border2);
+    background: var(--card);
     color: var(--text);
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
@@ -503,7 +517,7 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #2e2430;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 20px;
   }
   .ranking-back-btn {
@@ -539,12 +553,12 @@
     text-align: center;
     padding: 8px 4px;
     border-radius: 8px;
-    border: 1px solid #3a2e38;
+    border: 1px solid var(--border2);
     font-size: 11.5px;
     font-weight: 600;
     color: var(--muted);
     cursor: pointer;
-    background: #1c1c1e;
+    background: var(--card);
   }
   .ranking-tab.active {
     border-color: var(--magenta);
@@ -562,9 +576,9 @@
     gap: 10px;
     padding: 12px 14px;
     border-radius: 12px;
-    background: #1c1c1e;
+    background: var(--card);
     cursor: pointer;
-    border: 1px solid #2e2430;
+    border: 1px solid var(--border);
     transition: border-color 0.15s;
   }
   .ranking-item:active { border-color: var(--magenta); }
@@ -598,8 +612,8 @@
     position: absolute;
     top: 42px;
     right: 0;
-    background: #1c1c1e;
-    border: 1px solid #3a2e38;
+    background: var(--card);
+    border: 1px solid var(--border2);
     border-radius: 10px;
     padding: 10px;
     min-width: 160px;
@@ -616,7 +630,7 @@
   }
   .account-menu button {
     appearance: none;
-    border: 1px solid #3a2e38;
+    border: 1px solid var(--border2);
     background: transparent;
     color: var(--muted);
     border-radius: 20px;
@@ -629,7 +643,7 @@
   }
   .account-login-btn {
     appearance: none;
-    border: 1px solid #3a2e38;
+    border: 1px solid var(--border2);
     background: transparent;
     color: var(--text);
     border-radius: 20px;
@@ -720,7 +734,7 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #3a2e38;
+    background: var(--border2);
   }
   .onboarding-dots span.active { background: var(--accent); }
   .onboarding-actions {
@@ -733,7 +747,7 @@
   }
   .gate-box .onboarding-back-btn {
     background: transparent;
-    border: 1px solid #3a2e38;
+    border: 1px solid var(--border2);
     color: var(--text);
   }
   .onboarding-back-btn.hidden { display: none; }
@@ -764,7 +778,7 @@
     right: 16px;
     appearance: none;
     border: none;
-    background: #2e2430;
+    background: var(--border);
     color: var(--text);
     width: 30px;
     height: 30px;
@@ -797,7 +811,7 @@
     padding: 10px 4px;
     border-radius: 12px;
     border: none;
-    background: #1c1c1e;
+    background: var(--card);
     color: var(--muted);
     font-size: 10px;
     font-weight: 500;
@@ -856,8 +870,8 @@
     justify-content: space-between;
     gap: 10px;
     padding: 10px 12px;
-    background: #1c1c1e;
-    border: 1px solid #2e2430;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 10px;
   }
   .menu-item-name {
@@ -1080,7 +1094,7 @@
   </div>
 </div>
 
-<script src="data.js?v=20260702-3"></script>
+<script src="data.js?v=20260702-4"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1126,6 +1140,22 @@
       console.error('Erro ao registrar evento no GA', err);
     }
   };
+
+  const THEME_KEY = 'garimpa_theme';
+  function getCurrentTheme() { return localStorage.getItem(THEME_KEY) || 'dark'; }
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f2f5' : '#15101a';
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.textContent = theme === 'light' ? '🌙 Modo escuro' : '☀️ Modo claro';
+    if (mapInstance) updateMapTiles(theme);
+  }
+  function toggleTheme() {
+    const next = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  }
+  applyTheme(getCurrentTheme());
 
   const REG_KEY = 'garimpa_cadastro';
   const accountBar = document.getElementById('accountBar');
@@ -1182,6 +1212,7 @@
         <div class="account-menu" id="accountMenu">
           <span class="account-name">${currentReg.nome}</span>
           <button id="editNomeBtn">Editar nome</button>
+          <button id="themeToggleBtn">${getCurrentTheme() === 'light' ? '🌙 Modo escuro' : '☀️ Modo claro'}</button>
           <button id="logoutBtn">Sair</button>
         </div>
       `;
@@ -1202,6 +1233,11 @@
         } catch (err) {
           console.error('Erro ao salvar nome', err);
         }
+      });
+      document.getElementById('themeToggleBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleTheme();
+        accountMenu.classList.remove('open');
       });
       document.getElementById('logoutBtn').addEventListener('click', () => {
         window.trackEvent('logout');
@@ -2113,6 +2149,21 @@
   // --- Map ---
   let mapInstance = null;
   let mapMarkers = [];
+  let mapTileLayer = null;
+
+  function tileUrl(theme) {
+    return theme === 'light'
+      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  }
+  function updateMapTiles(theme) {
+    if (!mapInstance) return;
+    if (mapTileLayer) mapInstance.removeLayer(mapTileLayer);
+    mapTileLayer = L.tileLayer(tileUrl(theme), {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd', maxZoom: 20,
+    }).addTo(mapInstance);
+  }
 
   function markerIcon(state) {
     let svg, w, h, ax, ay;
@@ -2156,11 +2207,7 @@
   function initMap() {
     if (mapInstance) return;
     mapInstance = L.map('barsMap', { zoomControl: true }).setView([-23.555, -46.660], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(mapInstance);
+    updateMapTiles(getCurrentTheme());
     renderMapMarkers();
   }
 
