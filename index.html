@@ -1147,7 +1147,7 @@
     document.documentElement.dataset.theme = theme;
     document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f7f2f5' : '#15101a';
     const btn = document.getElementById('themeToggleBtn');
-    if (btn) btn.textContent = theme === 'light' ? '🌙 Modo escuro' : '☀️ Modo claro';
+    if (btn) btn.textContent = theme === 'light' ? 'Modo escuro' : 'Modo claro';
     if (mapInstance) updateMapTiles(theme);
   }
   function toggleTheme() {
@@ -1212,7 +1212,7 @@
         <div class="account-menu" id="accountMenu">
           <span class="account-name">${currentReg.nome}</span>
           <button id="editNomeBtn">Editar nome</button>
-          <button id="themeToggleBtn">${getCurrentTheme() === 'light' ? '🌙 Modo escuro' : '☀️ Modo claro'}</button>
+          <button id="themeToggleBtn">${getCurrentTheme() === 'light' ? 'Modo escuro' : 'Modo claro'}</button>
           <button id="logoutBtn">Sair</button>
         </div>
       `;
