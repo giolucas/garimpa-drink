@@ -38,7 +38,7 @@ const BARES = [
   { visitado: false, bar: "The Door Bar", instagram: "https://www.instagram.com/thedoor.bar", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56468, lng: -46.6888, endereco: "R. Fradique Coutinho, 1111" },
   { visitado: false, bar: "CRN 932", instagram: "https://www.instagram.com/crn.932", bairro: "Pinheiros", estilo: "Restaurante", lat: -23.56607, lng: -46.6824, endereco: "R. Cônego Eugênio Leite, 932" },
   { visitado: true, bar: "Picco", instagram: "https://www.instagram.com/o.picco", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56027, lng: -46.68653, endereco: "R. Lisboa, 294" },
-  { visitado: true, bar: "Santana Bar", instagram: "https://www.instagram.com/_santanabar", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56786, lng: -46.68746, endereco: "R. Joaquim Antunes, 1026" },
+  { visitado: true, bar: "Santana Bar", instagram: "https://www.instagram.com/_santanabar", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56786, lng: -46.68746, endereco: "R. Joaquim Antunes, 1026", novidadePost: "https://www.instagram.com/p/DayStO1HJd4/" },
   { visitado: false, bar: "Sylvester", instagram: "https://www.instagram.com/sylvesterbarsp", bairro: "Pinheiros", estilo: "Bar Balcão", lat: -23.56256, lng: -46.68127, endereco: "R. Maria Carolina, 745" },
   { visitado: true, bar: "Guarita", instagram: "https://www.instagram.com/guaritabar", bairro: "Pinheiros", estilo: "Bar Boteco", lat: -23.56228, lng: -46.68988, endereco: "R. Simão Álvares, 952" },
   { visitado: true, bar: "Moela Pinheiros", instagram: "https://www.instagram.com/barmoela", bairro: "Pinheiros", estilo: "Bar Boteco", lat: -23.56861, lng: -46.6834, endereco: "R. Cardeal Arcoverde, 2320" },
