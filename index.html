@@ -878,9 +878,86 @@
     font-size: 14px;
     font-weight: 600;
   }
+  #desktopModal {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 32px 24px;
+  }
+  #desktopModal.hidden { display: none; }
+  .desktop-modal-box {
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .desktop-modal-box p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 0;
+  }
+  .desktop-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .desktop-modal-actions button {
+    appearance: none;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #desktopContinueBtn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+  #desktopMobileBtn {
+    background: var(--magenta);
+    border: none;
+    color: #fff;
+  }
+  #thankYouScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+  }
+  #thankYouScreen.hidden { display: none; }
+  #thankYouScreen p {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
+<div id="desktopModal" class="hidden">
+  <div class="desktop-modal-box">
+    <div class="logo-mark" style="margin: 0 auto"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+    <p>A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.</p>
+    <div class="desktop-modal-actions">
+      <button id="desktopMobileBtn">Ok, vou acessar pelo celular.</button>
+      <button id="desktopContinueBtn">Desejo continuar pelo desktop</button>
+    </div>
+  </div>
+</div>
+<div id="thankYouScreen" class="hidden">
+  <p>Obrigado! :)</p>
+</div>
 <div id="gate">
   <div class="gate-box" id="passwordStep">
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
@@ -1156,6 +1233,22 @@
     applyTheme(next);
   }
   applyTheme(getCurrentTheme());
+
+  // Desktop warning modal
+  (function() {
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+      || (window.innerWidth <= 768 && navigator.maxTouchPoints > 0);
+    if (!isMobile) {
+      document.getElementById('desktopModal').classList.remove('hidden');
+      document.getElementById('desktopContinueBtn').addEventListener('click', () => {
+        document.getElementById('desktopModal').classList.add('hidden');
+      });
+      document.getElementById('desktopMobileBtn').addEventListener('click', () => {
+        document.getElementById('desktopModal').classList.add('hidden');
+        document.getElementById('thankYouScreen').classList.remove('hidden');
+      });
+    }
+  })();
 
   const REG_KEY = 'garimpa_cadastro';
   const accountBar = document.getElementById('accountBar');
