@@ -1170,7 +1170,6 @@
     <div class="header-top-actions">
       <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
       <button type="button" class="account-login-btn" id="rankingBtn">Ranking dos bares</button>
-      <button type="button" class="account-login-btn" id="langBtn">Idioma</button>
     </div>
     <div class="account-bar" id="accountBar"></div>
   </div>
@@ -1229,7 +1228,7 @@
   </div>
 </div>
 
-<script src="data.js?v=20260702-6"></script>
+<script src="data.js?v=20260715-1"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1342,7 +1341,6 @@
     const safeQ = (sel, text) => { const el = document.querySelector(sel); if (el) el.textContent = text; };
     safe('howToStartBtn', t('nav.howToStart'));
     safe('rankingBtn', t('nav.ranking'));
-    safe('langBtn', t('nav.language'));
     safe('aiRecommendBtn', t('header.ai'));
     safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
     safeQ('[data-val="all"]', t('filter.all'));
@@ -1467,6 +1465,7 @@
           <span class="account-name">${currentReg.nome}</span>
           <button id="editNomeBtn">${t('account.editName')}</button>
           <button id="themeToggleBtn">${getCurrentTheme() === 'light' ? t('account.darkMode') : t('account.lightMode')}</button>
+          <button id="langMenuBtn">${t('nav.language')}</button>
           <button id="logoutBtn">${t('account.logout')}</button>
         </div>
       `;
@@ -1492,6 +1491,12 @@
         e.stopPropagation();
         toggleTheme();
         accountMenu.classList.remove('open');
+      });
+      document.getElementById('langMenuBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        accountMenu.classList.remove('open');
+        document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
+        langModal.classList.remove('hidden');
       });
       document.getElementById('logoutBtn').addEventListener('click', () => {
         window.trackEvent('logout');
@@ -1940,10 +1945,6 @@
   rankingClose.addEventListener('click', () => rankingPage.classList.add('hidden'));
 
   const langModal = document.getElementById('langModal');
-  document.getElementById('langBtn').addEventListener('click', () => {
-    document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
-    langModal.classList.remove('hidden');
-  });
   langModal.addEventListener('click', (e) => { if (e.target === langModal) langModal.classList.add('hidden'); });
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.addEventListener('click', () => {
