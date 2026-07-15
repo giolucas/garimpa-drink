@@ -1275,108 +1275,6 @@
     }
   };
 
-  const LANG_KEY = 'garimpa_lang';
-  const TRANSLATIONS = {
-    pt: {
-      'nav.howToStart':'Como começar','nav.ranking':'Ranking dos bares','nav.language':'Idioma',
-      'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
-      'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
-      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
-      'search.placeholder':'Pesquise por bar, bairro ou categoria.','filter.allNeighborhoods':'Todos os Bairros','filter.allStyles':'Todas as Categorias',
-      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir em breve','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
-      'count.results':'{n} resultado(s){extra} — Listados em ordem alfabética.',
-      'empty.noResults':'Nenhum bar encontrado 🙁','empty.favorites':'Você ainda não favoritou nenhum bar. Toque no ♡ de um card para adicionar.','empty.visited':'Você ainda não marcou nenhum bar como visitado. Toque no pin de um card para marcar.','empty.soon':'Você ainda não marcou nenhum bar como "ir em breve". Toque no 🔖 de um card para marcar.',
-      'detail.instagram':'Instagram','detail.visited':'Visitei','detail.soon':'Em Breve','detail.favorite':'Favorito',
-      'novidade.badge':'✨ Novidade','novidade.link':'Ver post no Instagram ↗',
-      'ranking.title':'Ranking dos bares','ranking.back':'← Voltar','ranking.desc':'Aqui você vai ver os bares mais bem rankeados nas categorias abaixo, baseado na interação dos usuários do app. (em breve)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir em Breve',
-      'lang.title':'Escolha o idioma',
-      'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
-      'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
-      'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
-    },
-    en: {
-      'nav.howToStart':'How to start','nav.ranking':'Bar ranking','nav.language':'Language',
-      'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
-      'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
-      'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
-      'search.placeholder':'Search by bar, neighborhood or category.','filter.allNeighborhoods':'All Neighborhoods','filter.allStyles':'All Categories',
-      'count.visited':' — visited: {v} of {t}','count.soon':' — 🔖 {n} going soon','count.favorites':' — ♥ {n} favorite(s)','count.all':' — visited: {v} of {t}',
-      'count.results':'{n} result(s){extra} — Listed alphabetically.',
-      'empty.noResults':'No bars found 🙁','empty.favorites':"You haven't favorited any bar yet. Tap ♡ on a card to add.",'empty.visited':"You haven't marked any bar as visited. Tap the pin on a card.",'empty.soon':"You have no bars on your going-soon list. Tap 🔖 on a card.",
-      'detail.instagram':'Instagram','detail.visited':'Visited','detail.soon':'Going Soon','detail.favorite':'Favorite',
-      'novidade.badge':'✨ New','novidade.link':'View post on Instagram ↗',
-      'ranking.title':'Bar ranking','ranking.back':'← Back','ranking.desc':'Here you will see the top-ranked bars in the categories below, based on user interactions. (coming soon)','ranking.tab.favorites':'Favorites','ranking.tab.visited':'Visited','ranking.tab.soon':'Going Soon',
-      'lang.title':'Choose language',
-      'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
-      'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
-      'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
-    },
-    es: {
-      'nav.howToStart':'Cómo empezar','nav.ranking':'Ranking de bares','nav.language':'Idioma',
-      'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
-      'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
-      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
-      'search.placeholder':'Buscar por bar, barrio o categoría.','filter.allNeighborhoods':'Todos los barrios','filter.allStyles':'Todas las categorías',
-      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir pronto','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
-      'count.results':'{n} resultado(s){extra} — Listados alfabéticamente.',
-      'empty.noResults':'No se encontraron bares 🙁','empty.favorites':'Aún no marcaste ningún bar como favorito. Toca ♡ en una tarjeta.','empty.visited':'Aún no marcaste ningún bar como visitado. Toca el pin en una tarjeta.','empty.soon':"No tienes bares en tu lista de ir pronto. Toca 🔖 en una tarjeta.",
-      'detail.instagram':'Instagram','detail.visited':'Visitado','detail.soon':'Ir pronto','detail.favorite':'Favorito',
-      'novidade.badge':'✨ Novedad','novidade.link':'Ver publicación en Instagram ↗',
-      'ranking.title':'Ranking de bares','ranking.back':'← Volver','ranking.desc':'Aquí verás los bares mejor rankeados según la interacción de los usuarios. (próximamente)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir pronto',
-      'lang.title':'Elige el idioma',
-      'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
-      'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
-      'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
-    },
-  };
-  function getCurrentLang() { return localStorage.getItem(LANG_KEY) || 'pt'; }
-  function t(key, vars) {
-    const lang = getCurrentLang();
-    let s = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['pt'][key] || key;
-    if (vars) Object.keys(vars).forEach(k => { s = s.replace('{'+k+'}', vars[k]); });
-    return s;
-  }
-  function applyI18n() {
-    const safe = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-    const safeQ = (sel, text) => { const el = document.querySelector(sel); if (el) el.textContent = text; };
-    safe('howToStartBtn', t('nav.howToStart'));
-    safe('rankingBtn', t('nav.ranking'));
-    safe('aiRecommendBtn', t('header.ai'));
-    safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
-    safeQ('[data-val="all"]', t('filter.all'));
-    safeQ('[data-val="visited"]', t('filter.visited'));
-    safeQ('[data-val="embreve"]', t('filter.soon'));
-    safeQ('[data-val="favorites"]', t('filter.favorites'));
-    const searchEl = document.getElementById('search'); if (searchEl) searchEl.placeholder = t('search.placeholder');
-    safeQ('#bairroFilter option[value=""]', t('filter.allNeighborhoods'));
-    safeQ('#estiloFilter option[value=""]', t('filter.allStyles'));
-    safeQ('#desktopModal p', t('desktop.message'));
-    safe('desktopMobileBtn', t('desktop.mobile'));
-    safe('desktopContinueBtn', t('desktop.continue'));
-    safeQ('#thankYouScreen p', t('thankyou'));
-    safeQ('.ranking-page-title', t('ranking.title'));
-    safeQ('.ranking-desc', t('ranking.desc'));
-    safe('rankingClose', t('ranking.back'));
-    safeQ('[data-field="favoritos"]', t('ranking.tab.favorites'));
-    safeQ('[data-field="visitados"]', t('ranking.tab.visited'));
-    safeQ('[data-field="embreve"]', t('ranking.tab.soon'));
-    safeQ('#aiRecommendOverlay h2', t('ai.title'));
-    safeQ('#aiRecommendAskBlock p', t('ai.desc'));
-    const aiInput = document.getElementById('aiRecommendInput'); if (aiInput) aiInput.placeholder = t('ai.placeholder');
-    safeQ('#aiRecommendForm button[type="submit"]', t('ai.submit'));
-    safeQ('#aiRecommendResultBlock p', t('ai.result'));
-    safe('aiRecommendCloseResult', t('ai.close'));
-    safeQ('#passwordStep p', t('gate.restricted'));
-    const gpEl = document.getElementById('gatePassword'); if (gpEl) gpEl.placeholder = t('gate.password');
-    safe('gateOver18Label', t('gate.over18'));
-    safeQ('#gateForm button[type="submit"]', t('gate.submit'));
-    safe('langModalTitle', t('lang.title'));
-    document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
-    render();
-    renderAccountBar();
-    if (detailBar) openBarDetail(detailBar._id);
-  }
-
   const THEME_KEY = 'garimpa_theme';
   function getCurrentTheme() { return localStorage.getItem(THEME_KEY) || 'dark'; }
   function applyTheme(theme) {
@@ -1514,6 +1412,7 @@
       });
     }
   }
+  window.renderAccountBar = renderAccountBar;
 
   const cadastroBlocks = {
     register: cadastroRegisterBlock,
@@ -2267,6 +2166,108 @@
 
   function normalize(s) {
     return (s || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  var LANG_KEY = 'garimpa_lang';
+  var TRANSLATIONS = {
+    pt: {
+      'nav.howToStart':'Como começar','nav.ranking':'Ranking dos bares','nav.language':'Idioma',
+      'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
+      'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
+      'search.placeholder':'Pesquise por bar, bairro ou categoria.','filter.allNeighborhoods':'Todos os Bairros','filter.allStyles':'Todas as Categorias',
+      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir em breve','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
+      'count.results':'{n} resultado(s){extra} — Listados em ordem alfabética.',
+      'empty.noResults':'Nenhum bar encontrado 🙁','empty.favorites':'Você ainda não favoritou nenhum bar. Toque no ♡ de um card para adicionar.','empty.visited':'Você ainda não marcou nenhum bar como visitado. Toque no pin de um card para marcar.','empty.soon':'Você ainda não marcou nenhum bar como "ir em breve". Toque no 🔖 de um card para marcar.',
+      'detail.instagram':'Instagram','detail.visited':'Visitei','detail.soon':'Em Breve','detail.favorite':'Favorito',
+      'novidade.badge':'✨ Novidade','novidade.link':'Ver post no Instagram ↗',
+      'ranking.title':'Ranking dos bares','ranking.back':'← Voltar','ranking.desc':'Aqui você vai ver os bares mais bem rankeados nas categorias abaixo, baseado na interação dos usuários do app. (em breve)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir em Breve',
+      'lang.title':'Escolha o idioma',
+      'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
+      'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
+      'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
+    },
+    en: {
+      'nav.howToStart':'How to start','nav.ranking':'Bar ranking','nav.language':'Language',
+      'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
+      'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
+      'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
+      'search.placeholder':'Search by bar, neighborhood or category.','filter.allNeighborhoods':'All Neighborhoods','filter.allStyles':'All Categories',
+      'count.visited':' — visited: {v} of {t}','count.soon':' — 🔖 {n} going soon','count.favorites':' — ♥ {n} favorite(s)','count.all':' — visited: {v} of {t}',
+      'count.results':'{n} result(s){extra} — Listed alphabetically.',
+      'empty.noResults':'No bars found 🙁','empty.favorites':"You haven't favorited any bar yet. Tap ♡ on a card to add.",'empty.visited':"You haven't marked any bar as visited. Tap the pin on a card.",'empty.soon':"You have no bars on your going-soon list. Tap 🔖 on a card.",
+      'detail.instagram':'Instagram','detail.visited':'Visited','detail.soon':'Going Soon','detail.favorite':'Favorite',
+      'novidade.badge':'✨ New','novidade.link':'View post on Instagram ↗',
+      'ranking.title':'Bar ranking','ranking.back':'← Back','ranking.desc':'Here you will see the top-ranked bars in the categories below, based on user interactions. (coming soon)','ranking.tab.favorites':'Favorites','ranking.tab.visited':'Visited','ranking.tab.soon':'Going Soon',
+      'lang.title':'Choose language',
+      'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
+      'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
+      'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
+    },
+    es: {
+      'nav.howToStart':'Cómo empezar','nav.ranking':'Ranking de bares','nav.language':'Idioma',
+      'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
+      'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
+      'search.placeholder':'Buscar por bar, barrio o categoría.','filter.allNeighborhoods':'Todos los barrios','filter.allStyles':'Todas las categorías',
+      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir pronto','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
+      'count.results':'{n} resultado(s){extra} — Listados alfabéticamente.',
+      'empty.noResults':'No se encontraron bares 🙁','empty.favorites':'Aún no marcaste ningún bar como favorito. Toca ♡ en una tarjeta.','empty.visited':'Aún no marcaste ningún bar como visitado. Toca el pin en una tarjeta.','empty.soon':"No tienes bares en tu lista de ir pronto. Toca 🔖 en una tarjeta.",
+      'detail.instagram':'Instagram','detail.visited':'Visitado','detail.soon':'Ir pronto','detail.favorite':'Favorito',
+      'novidade.badge':'✨ Novedad','novidade.link':'Ver publicación en Instagram ↗',
+      'ranking.title':'Ranking de bares','ranking.back':'← Volver','ranking.desc':'Aquí verás los bares mejor rankeados según la interacción de los usuarios. (próximamente)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir pronto',
+      'lang.title':'Elige el idioma',
+      'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
+      'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
+      'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
+    },
+  };
+  function getCurrentLang() { return localStorage.getItem(LANG_KEY) || 'pt'; }
+  function t(key, vars) {
+    var lang = getCurrentLang();
+    var s = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['pt'][key] || key;
+    if (vars) Object.keys(vars).forEach(function(k) { s = s.replace('{'+k+'}', vars[k]); });
+    return s;
+  }
+  function applyI18n() {
+    var safe = function(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
+    var safeQ = function(sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
+    safe('howToStartBtn', t('nav.howToStart'));
+    safe('rankingBtn', t('nav.ranking'));
+    safe('aiRecommendBtn', t('header.ai'));
+    safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
+    safeQ('[data-val="all"]', t('filter.all'));
+    safeQ('[data-val="visited"]', t('filter.visited'));
+    safeQ('[data-val="embreve"]', t('filter.soon'));
+    safeQ('[data-val="favorites"]', t('filter.favorites'));
+    var searchEl = document.getElementById('search'); if (searchEl) searchEl.placeholder = t('search.placeholder');
+    safeQ('#bairroFilter option[value=""]', t('filter.allNeighborhoods'));
+    safeQ('#estiloFilter option[value=""]', t('filter.allStyles'));
+    safeQ('#desktopModal p', t('desktop.message'));
+    safe('desktopMobileBtn', t('desktop.mobile'));
+    safe('desktopContinueBtn', t('desktop.continue'));
+    safeQ('#thankYouScreen p', t('thankyou'));
+    safeQ('.ranking-page-title', t('ranking.title'));
+    safeQ('.ranking-desc', t('ranking.desc'));
+    safe('rankingClose', t('ranking.back'));
+    safeQ('[data-field="favoritos"]', t('ranking.tab.favorites'));
+    safeQ('[data-field="visitados"]', t('ranking.tab.visited'));
+    safeQ('[data-field="embreve"]', t('ranking.tab.soon'));
+    safeQ('#aiRecommendOverlay h2', t('ai.title'));
+    safeQ('#aiRecommendAskBlock p', t('ai.desc'));
+    var aiInput = document.getElementById('aiRecommendInput'); if (aiInput) aiInput.placeholder = t('ai.placeholder');
+    safeQ('#aiRecommendForm button[type="submit"]', t('ai.submit'));
+    safeQ('#aiRecommendResultBlock p', t('ai.result'));
+    safe('aiRecommendCloseResult', t('ai.close'));
+    safeQ('#passwordStep p', t('gate.restricted'));
+    var gpEl = document.getElementById('gatePassword'); if (gpEl) gpEl.placeholder = t('gate.password');
+    safe('gateOver18Label', t('gate.over18'));
+    safeQ('#gateForm button[type="submit"]', t('gate.submit'));
+    safe('langModalTitle', t('lang.title'));
+    document.querySelectorAll('.lang-option').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()); });
+    render();
+    if (window.renderAccountBar) window.renderAccountBar();
+    if (detailBar) openBarDetail(detailBar._id);
   }
 
   function render() {
