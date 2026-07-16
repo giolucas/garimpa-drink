@@ -559,6 +559,12 @@
   }
   .mylist-share-btn:active { opacity: 0.7; }
   .mylist-share-btn.hidden { display: none; }
+  .mylist-alpha-note {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin: 6px 0 10px;
+  }
   .mylist-brand {
     display: flex;
     flex-direction: column;
@@ -1201,6 +1207,7 @@
       <div class="ranking-tab" data-field="visitados">Visitados</div>
       <div class="ranking-tab" data-field="embreve">Ir em Breve</div>
     </div>
+    <p class="mylist-alpha-note" id="myListAlphaNote">Selecionados e organizados por ordem alfabética.</p>
     <div class="ranking-list" id="rankingList"></div>
   </div>
 </div>
@@ -1848,6 +1855,20 @@
   const rankingTabs = rankingPage.querySelectorAll('.ranking-tab');
   let rankingField = 'favoritos';
 
+  function updateMyListTabCounts() {
+    var shared = window.sharedListData;
+    var counts = {
+      favoritos: shared ? (shared.f || []).length : favoritos.size,
+      visitados: shared ? (shared.v || []).length : visitados.size,
+      embreve:   shared ? (shared.e || []).length : embreve.size,
+    };
+    var labels = { favoritos: t('ranking.tab.favorites'), visitados: t('ranking.tab.visited'), embreve: t('ranking.tab.soon') };
+    rankingTabs.forEach(function(tab) {
+      var field = tab.dataset.field;
+      tab.textContent = labels[field] + ' (' + counts[field] + ')';
+    });
+  }
+
   function updateMyListTitle() {
     var el = document.getElementById('myListTitle');
     if (!el) return;
@@ -1867,6 +1888,7 @@
       else ids = [...embreve];
     }
     var bars = ids.map(id => data.find(b => b._id === id)).filter(Boolean);
+    bars.sort((a, b) => a.bar.localeCompare(b.bar));
     var emptyMsg = rankingField === 'favoritos' ? t('empty.favorites') : rankingField === 'visitados' ? t('empty.visited') : t('empty.soon');
     rankingList.innerHTML = bars.length
       ? bars.map((b, i) => `
@@ -1896,6 +1918,7 @@
     rankingTabs.forEach(t => t.classList.toggle('active', t.dataset.field === 'favoritos'));
     document.getElementById('myListShareBtn').classList.remove('hidden');
     updateMyListTitle();
+    updateMyListTabCounts();
     renderMyList();
     rankingPage.classList.remove('hidden');
   });
@@ -2030,6 +2053,7 @@
     rankingTabs.forEach(function(t) { t.classList.toggle('active', t.dataset.field === 'favoritos'); });
     document.getElementById('myListShareBtn').classList.add('hidden');
     updateMyListTitle();
+    updateMyListTabCounts();
     renderMyList();
     rankingPage.classList.remove('hidden');
   }
@@ -2262,7 +2286,7 @@
       'detail.instagram':'Instagram','detail.visited':'Visitei','detail.soon':'Em Breve','detail.favorite':'Favorito',
       'novidade.badge':'✨ Novidade','novidade.link':'Ver post no Instagram ↗',
       'ranking.title':'Lista de {name}','ranking.back':'← Voltar','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir em Breve',
-      'mylist.share':'Compartilhar','mylist.shareMsg':'Crie sua conta no Garimpa Drink e visualize a lista de bares que eu criei e te indico',
+      'mylist.share':'Compartilhar','mylist.shareMsg':'Crie sua conta no Garimpa Drink e visualize a lista de bares que eu criei e te indico','mylist.alphaNote':'Selecionados e organizados por ordem alfabética.',
       'lang.title':'Escolha o idioma',
       'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
       'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
@@ -2289,7 +2313,7 @@
       'detail.instagram':'Instagram','detail.visited':'Visited','detail.soon':'Going Soon','detail.favorite':'Favorite',
       'novidade.badge':'✨ New','novidade.link':'View post on Instagram ↗',
       'ranking.title':'{name}\'s list','ranking.back':'← Back','ranking.tab.favorites':'Favorites','ranking.tab.visited':'Visited','ranking.tab.soon':'Going Soon',
-      'mylist.share':'Share','mylist.shareMsg':'Create an account on Garimpa Drink and see the bar list I put together for you',
+      'mylist.share':'Share','mylist.shareMsg':'Create an account on Garimpa Drink and see the bar list I put together for you','mylist.alphaNote':'Selected and organized alphabetically.',
       'lang.title':'Choose language',
       'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
       'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
@@ -2316,7 +2340,7 @@
       'detail.instagram':'Instagram','detail.visited':'Visitado','detail.soon':'Ir pronto','detail.favorite':'Favorito',
       'novidade.badge':'✨ Novedad','novidade.link':'Ver publicación en Instagram ↗',
       'ranking.title':'Lista de {name}','ranking.back':'← Volver','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir pronto',
-      'mylist.share':'Compartir','mylist.shareMsg':'Crea tu cuenta en Garimpa Drink y visualiza la lista de bares que te recomiendo',
+      'mylist.share':'Compartir','mylist.shareMsg':'Crea tu cuenta en Garimpa Drink y visualiza la lista de bares que te recomiendo','mylist.alphaNote':'Seleccionados y organizados alfabéticamente.',
       'lang.title':'Elige el idioma',
       'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
       'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
@@ -2362,9 +2386,8 @@
     updateMyListTitle();
     safe('myListShareBtn', t('mylist.share'));
     safe('rankingClose', t('ranking.back'));
-    safeQ('[data-field="favoritos"]', t('ranking.tab.favorites'));
-    safeQ('[data-field="visitados"]', t('ranking.tab.visited'));
-    safeQ('[data-field="embreve"]', t('ranking.tab.soon'));
+    updateMyListTabCounts();
+    safe('myListAlphaNote', t('mylist.alphaNote'));
     safeQ('#aiRecommendOverlay h2', t('ai.title'));
     safeQ('#aiRecommendAskBlock p', t('ai.desc'));
     var aiInput = document.getElementById('aiRecommendInput'); if (aiInput) aiInput.placeholder = t('ai.placeholder');
