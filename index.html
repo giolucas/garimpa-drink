@@ -1246,12 +1246,20 @@
       <h2>Favorite seus preferidos</h2>
       <p>Toque no coração pra favoritar os bares que você mais ama.</p>
     </div>
+    <div class="onboarding-step hidden" data-step="5">
+      <div class="onboarding-icon-wrap" style="color: var(--magenta);">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </div>
+      <h2>Compartilhe sua lista!</h2>
+      <p>Entre em Minha lista e compartilhe os bares que você selecionou com seus amigos.</p>
+    </div>
     <div class="onboarding-dots">
       <span class="active" data-dot="0"></span>
       <span data-dot="1"></span>
       <span data-dot="2"></span>
       <span data-dot="3"></span>
       <span data-dot="4"></span>
+      <span data-dot="5"></span>
     </div>
     <div class="onboarding-actions">
       <button type="button" id="onboardingBackBtn" class="onboarding-back-btn hidden">Voltar</button>
@@ -2467,6 +2475,7 @@
       'onboarding.step2.title':'Marque os bares que você já foi','onboarding.step2.text':'Toque no pin pra marcar os bares que você já visitou e acompanhar seu progresso.',
       'onboarding.step3.title':'Salve os bares que você quer ir em breve','onboarding.step3.text':'Toque no marcador pra guardar os bares que você ainda quer conhecer.',
       'onboarding.step4.title':'Favorite seus preferidos','onboarding.step4.text':'Toque no coração pra favoritar os bares que você mais ama.',
+      'onboarding.step5.title':'Compartilhe sua lista!','onboarding.step5.text':'Entre em Minha lista e compartilhe os bares que você selecionou com seus amigos.',
       'onboarding.next':'Próximo','onboarding.done':'Entendi','onboarding.back':'Voltar',
     },
     en: {
@@ -2494,6 +2503,7 @@
       'onboarding.step2.title':'Mark the bars you\'ve been to','onboarding.step2.text':'Tap the pin to mark the bars you\'ve visited and track your progress.',
       'onboarding.step3.title':'Save bars you want to visit soon','onboarding.step3.text':'Tap the bookmark to save bars you still want to explore.',
       'onboarding.step4.title':'Favorite your top picks','onboarding.step4.text':'Tap the heart to favorite the bars you love the most.',
+      'onboarding.step5.title':'Share your list!','onboarding.step5.text':'Go to My list and share the bars you selected with your friends.',
       'onboarding.next':'Next','onboarding.done':'Got it','onboarding.back':'Back',
     },
     es: {
@@ -2521,6 +2531,7 @@
       'onboarding.step2.title':'Marca los bares que ya visitaste','onboarding.step2.text':'Toca el pin para marcar los bares que ya visitaste y seguir tu progreso.',
       'onboarding.step3.title':'Guarda los bares que quieres visitar pronto','onboarding.step3.text':'Toca el marcador para guardar los bares que aún quieres conocer.',
       'onboarding.step4.title':'Marca tus favoritos','onboarding.step4.text':'Toca el corazón para marcar como favoritos los bares que más te gustan.',
+      'onboarding.step5.title':'¡Comparte tu lista!','onboarding.step5.text':'Ve a Mi lista y comparte los bares que seleccionaste con tus amigos.',
       'onboarding.next':'Siguiente','onboarding.done':'Entendido','onboarding.back':'Volver',
     },
   };
@@ -2576,6 +2587,7 @@
     safeQ('[data-step="2"] h2', t('onboarding.step2.title')); safeQ('[data-step="2"] p', t('onboarding.step2.text'));
     safeQ('[data-step="3"] h2', t('onboarding.step3.title')); safeQ('[data-step="3"] p', t('onboarding.step3.text'));
     safeQ('[data-step="4"] h2', t('onboarding.step4.title')); safeQ('[data-step="4"] p', t('onboarding.step4.text'));
+    safeQ('[data-step="5"] h2', t('onboarding.step5.title')); safeQ('[data-step="5"] p', t('onboarding.step5.text'));
     safe('onboardingBackBtn', t('onboarding.back'));
     render();
     if (window.renderAccountBar) window.renderAccountBar();
