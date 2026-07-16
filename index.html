@@ -2092,7 +2092,7 @@
     detailBarName.textContent = b.bar;
     detailMeta.innerHTML = `
       ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
-      ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
+      ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(tCat(b.estilo))}</button>` : ''}
       ${b.endereco ? `<span class="meta-address">${escapeHtml(b.endereco)}${b.bairro ? ' · ' + escapeHtml(b.bairro) : ''}</span>` : ''}
     `;
     detailMeta.querySelectorAll('[data-action="estilo"]').forEach(btn => {
@@ -2160,7 +2160,7 @@
   });
   uniqueSorted('estilo').forEach(v => {
     const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
+    opt.value = v; opt.textContent = tCat(v);
     estiloFilter.appendChild(opt);
   });
 
@@ -2186,6 +2186,7 @@
       'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
       'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
       'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
+      'cat.Alta Coquetelaria':'Alta Coquetelaria','cat.Bar Balada':'Bar com Música','cat.Bar Balcão':'Bar Balcão','cat.Bar Boteco':'Bar "Boteco"','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurante','cat.Speakeasy':'Speakeasy',
       'header.subtitle':'O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) ',
       'header.age':'Destinado para maiores de 18 anos.',
       'onboarding.step0.title':'Boas vindas ao Garimpa Drink!','onboarding.step0.text':'Esperamos que aproveite muito e que beba com moderação. 😊',
@@ -2211,6 +2212,7 @@
       'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
       'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
       'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
+      'cat.Alta Coquetelaria':'Craft Cocktails','cat.Bar Balada':'Party Bar','cat.Bar Balcão':'Cocktail Counter','cat.Bar Boteco':'Boteco Bar','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurant','cat.Speakeasy':'Speakeasy',
       'header.subtitle':'The most interesting cocktail bar guide in São Paulo.<br>(Coming soon to other cities :)<br>By Giovanni Lucas :) ',
       'header.age':'For adults 18 and over.',
       'onboarding.step0.title':'Welcome to Garimpa Drink!','onboarding.step0.text':'We hope you enjoy it and drink responsibly. 😊',
@@ -2236,6 +2238,7 @@
       'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
       'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
       'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
+      'cat.Alta Coquetelaria':'Coctelería de Autor','cat.Bar Balada':'Bar con Música','cat.Bar Balcão':'Bar con Barra','cat.Bar Boteco':'Bar "Boteco"','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurante','cat.Speakeasy':'Speakeasy',
       'header.subtitle':'La guía de bares de cócteles más interesante de São Paulo.<br>(Próximamente en otras ciudades :)<br>Por Giovanni Lucas :) ',
       'header.age':'Destinado a mayores de 18 años.',
       'onboarding.step0.title':'¡Bienvenido a Garimpa Drink!','onboarding.step0.text':'Esperamos que lo disfrutes y bebas con moderación. 😊',
@@ -2253,6 +2256,7 @@
     if (vars) Object.keys(vars).forEach(function(k) { s = s.replace('{'+k+'}', vars[k]); });
     return s;
   }
+  function tCat(estilo) { return estilo ? (t('cat.' + estilo) || estilo) : ''; }
   function applyI18n() {
     var safe = function(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
     var safeQ = function(sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
@@ -2267,6 +2271,7 @@
     var searchEl = document.getElementById('search'); if (searchEl) searchEl.placeholder = t('search.placeholder');
     safeQ('#bairroFilter option[value=""]', t('filter.allNeighborhoods'));
     safeQ('#estiloFilter option[value=""]', t('filter.allStyles'));
+    document.querySelectorAll('#estiloFilter option:not([value=""])').forEach(function(opt) { opt.textContent = tCat(opt.value); });
     safeQ('#desktopModal p', t('desktop.message'));
     safe('desktopMobileBtn', t('desktop.mobile'));
     safe('desktopContinueBtn', t('desktop.continue'));
@@ -2354,7 +2359,7 @@
         </div>
         <div class="meta">
           ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
-          ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
+          ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(tCat(b.estilo))}</button>` : ''}
           ${b.novidadePost ? `<span class="novidade-badge">${t('novidade.badge')}</span>` : ''}
         </div>
       </div>
