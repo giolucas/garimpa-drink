@@ -484,6 +484,27 @@
     width: 100%;
   }
   .account-bar { z-index: 20; }
+  .header-top-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .lang-first-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    display: none;
+  }
+  #langFirstOverlay[data-closeable] .lang-first-close { display: block; }
   .header-top-actions {
     display: flex;
     gap: 5px;
@@ -542,6 +563,47 @@
     text-align: center;
     margin-bottom: 16px;
     line-height: 1.5;
+  }
+  .mylist-share-btn {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    margin-bottom: 4px;
+    background: transparent;
+    border: 1.5px solid var(--magenta);
+    border-radius: 10px;
+    color: var(--magenta);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+  .mylist-share-btn:active { opacity: 0.7; }
+  .mylist-share-btn.hidden { display: none; }
+  .mylist-alpha-note {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin: 6px 0 10px;
+  }
+  .mylist-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 14px;
+  }
+  .mylist-brand .logo-mark {
+    width: 52px;
+    height: 52px;
+  }
+  .mylist-brand .logo-mark .sq { width: 29px; height: 29px; }
+  .mylist-brand .logo-mark .ci { width: 24px; height: 24px; }
+  .mylist-brand .logo-mark .ha { width: 16px; height: 8px; }
+  .mylist-brand-name {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
   .ranking-tabs {
     display: flex;
@@ -942,6 +1004,53 @@
     font-weight: 700;
     color: var(--text);
   }
+  #langFirstOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 24px;
+  }
+  #langFirstOverlay.hidden { display: none; }
+  .lang-first-box {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .lang-first-title {
+    font-size: 26px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0;
+  }
+  .lang-first-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .lang-first-btn {
+    appearance: none;
+    background: var(--card);
+    border: 1.5px solid var(--border2);
+    border-radius: 14px;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 18px 20px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .lang-first-btn:active { border-color: var(--magenta); color: var(--magenta); }
   #langModal {
     position: fixed;
     inset: 0;
@@ -1014,6 +1123,21 @@
 </div>
 <div id="thankYouScreen" class="hidden">
   <p>Obrigado! :)</p>
+</div>
+<div id="langFirstOverlay" style="position:relative">
+  <button type="button" class="lang-first-close" id="langFirstClose">&times;</button>
+  <div class="lang-first-box">
+    <div class="mylist-brand">
+      <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+      <span class="mylist-brand-name">Garimpa Drink</span>
+    </div>
+    <h2 class="lang-first-title">Escolha o idioma</h2>
+    <div class="lang-first-options">
+      <button class="lang-first-btn" data-lang="pt">🇧🇷 PT/BR</button>
+      <button class="lang-first-btn" data-lang="en">🇺🇸 ENG/US</button>
+      <button class="lang-first-btn" data-lang="es">🇪🇸 ESP</button>
+    </div>
+  </div>
 </div>
 <div id="gate">
   <div class="gate-box" id="passwordStep">
@@ -1155,13 +1279,18 @@
     <div class="ranking-page-topbar">
       <button type="button" id="rankingClose" class="ranking-back-btn">← Voltar</button>
     </div>
-    <h2 class="ranking-page-title">Ranking dos bares</h2>
-    <p class="ranking-desc">Aqui você vai ver os bares mais bem rankeados nas categorias abaixo, baseado na interação dos usuários do app. (em breve)</p>
+    <div class="mylist-brand">
+      <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+      <span class="mylist-brand-name">Garimpa Drink</span>
+    </div>
+    <h2 class="ranking-page-title" id="myListTitle">Minha lista</h2>
+    <button type="button" id="myListShareBtn" class="mylist-share-btn">Compartilhar</button>
     <div class="ranking-tabs">
       <div class="ranking-tab active" data-field="favoritos">Favoritos</div>
       <div class="ranking-tab" data-field="visitados">Visitados</div>
       <div class="ranking-tab" data-field="embreve">Ir em Breve</div>
     </div>
+    <p class="mylist-alpha-note" id="myListAlphaNote">Selecionados e organizados por ordem alfabética.</p>
     <div class="ranking-list" id="rankingList"></div>
   </div>
 </div>
@@ -1169,10 +1298,12 @@
   <div class="header-top-row">
     <div class="header-top-actions">
       <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
-      <button type="button" class="account-login-btn" id="rankingBtn">Ranking dos bares</button>
-      <button type="button" class="account-login-btn" id="langBtn">Idioma</button>
+      <button type="button" class="account-login-btn" id="rankingBtn">Minha lista</button>
     </div>
-    <div class="account-bar" id="accountBar"></div>
+    <div class="header-top-right">
+      <div class="account-bar" id="accountBar"></div>
+      <button type="button" class="account-login-btn" id="langPermanentBtn">Idioma</button>
+    </div>
   </div>
 </div>
 <header>
@@ -1180,7 +1311,7 @@
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
-  <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <div class="subtitle"><span id="subtitleText">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) </span><a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice" id="subtitleAge">Destinado para maiores de 18 anos.</span></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -1229,7 +1360,7 @@
   </div>
 </div>
 
-<script src="data.js?v=20260702-6"></script>
+<script src="data.js?v=20260715-1"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, increment, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1275,109 +1406,6 @@
       console.error('Erro ao registrar evento no GA', err);
     }
   };
-
-  const LANG_KEY = 'garimpa_lang';
-  const TRANSLATIONS = {
-    pt: {
-      'nav.howToStart':'Como começar','nav.ranking':'Ranking dos bares','nav.language':'Idioma',
-      'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
-      'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
-      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
-      'search.placeholder':'Pesquise por bar, bairro ou categoria.','filter.allNeighborhoods':'Todos os Bairros','filter.allStyles':'Todas as Categorias',
-      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir em breve','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
-      'count.results':'{n} resultado(s){extra} — Listados em ordem alfabética.',
-      'empty.noResults':'Nenhum bar encontrado 🙁','empty.favorites':'Você ainda não favoritou nenhum bar. Toque no ♡ de um card para adicionar.','empty.visited':'Você ainda não marcou nenhum bar como visitado. Toque no pin de um card para marcar.','empty.soon':'Você ainda não marcou nenhum bar como "ir em breve". Toque no 🔖 de um card para marcar.',
-      'detail.instagram':'Instagram','detail.visited':'Visitei','detail.soon':'Em Breve','detail.favorite':'Favorito',
-      'novidade.badge':'✨ Novidade','novidade.link':'Ver post no Instagram ↗',
-      'ranking.title':'Ranking dos bares','ranking.back':'← Voltar','ranking.desc':'Aqui você vai ver os bares mais bem rankeados nas categorias abaixo, baseado na interação dos usuários do app. (em breve)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir em Breve',
-      'lang.title':'Escolha o idioma',
-      'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
-      'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
-      'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
-    },
-    en: {
-      'nav.howToStart':'How to start','nav.ranking':'Bar ranking','nav.language':'Language',
-      'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
-      'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
-      'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
-      'search.placeholder':'Search by bar, neighborhood or category.','filter.allNeighborhoods':'All Neighborhoods','filter.allStyles':'All Categories',
-      'count.visited':' — visited: {v} of {t}','count.soon':' — 🔖 {n} going soon','count.favorites':' — ♥ {n} favorite(s)','count.all':' — visited: {v} of {t}',
-      'count.results':'{n} result(s){extra} — Listed alphabetically.',
-      'empty.noResults':'No bars found 🙁','empty.favorites':"You haven't favorited any bar yet. Tap ♡ on a card to add.",'empty.visited':"You haven't marked any bar as visited. Tap the pin on a card.",'empty.soon':"You have no bars on your going-soon list. Tap 🔖 on a card.",
-      'detail.instagram':'Instagram','detail.visited':'Visited','detail.soon':'Going Soon','detail.favorite':'Favorite',
-      'novidade.badge':'✨ New','novidade.link':'View post on Instagram ↗',
-      'ranking.title':'Bar ranking','ranking.back':'← Back','ranking.desc':'Here you will see the top-ranked bars in the categories below, based on user interactions. (coming soon)','ranking.tab.favorites':'Favorites','ranking.tab.visited':'Visited','ranking.tab.soon':'Going Soon',
-      'lang.title':'Choose language',
-      'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
-      'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
-      'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
-    },
-    es: {
-      'nav.howToStart':'Cómo empezar','nav.ranking':'Ranking de bares','nav.language':'Idioma',
-      'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
-      'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
-      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
-      'search.placeholder':'Buscar por bar, barrio o categoría.','filter.allNeighborhoods':'Todos los barrios','filter.allStyles':'Todas las categorías',
-      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir pronto','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
-      'count.results':'{n} resultado(s){extra} — Listados alfabéticamente.',
-      'empty.noResults':'No se encontraron bares 🙁','empty.favorites':'Aún no marcaste ningún bar como favorito. Toca ♡ en una tarjeta.','empty.visited':'Aún no marcaste ningún bar como visitado. Toca el pin en una tarjeta.','empty.soon':"No tienes bares en tu lista de ir pronto. Toca 🔖 en una tarjeta.",
-      'detail.instagram':'Instagram','detail.visited':'Visitado','detail.soon':'Ir pronto','detail.favorite':'Favorito',
-      'novidade.badge':'✨ Novedad','novidade.link':'Ver publicación en Instagram ↗',
-      'ranking.title':'Ranking de bares','ranking.back':'← Volver','ranking.desc':'Aquí verás los bares mejor rankeados según la interacción de los usuarios. (próximamente)','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir pronto',
-      'lang.title':'Elige el idioma',
-      'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
-      'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
-      'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
-    },
-  };
-  function getCurrentLang() { return localStorage.getItem(LANG_KEY) || 'pt'; }
-  function t(key, vars) {
-    const lang = getCurrentLang();
-    let s = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['pt'][key] || key;
-    if (vars) Object.keys(vars).forEach(k => { s = s.replace('{'+k+'}', vars[k]); });
-    return s;
-  }
-  function applyI18n() {
-    const safe = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-    const safeQ = (sel, text) => { const el = document.querySelector(sel); if (el) el.textContent = text; };
-    safe('howToStartBtn', t('nav.howToStart'));
-    safe('rankingBtn', t('nav.ranking'));
-    safe('langBtn', t('nav.language'));
-    safe('aiRecommendBtn', t('header.ai'));
-    safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
-    safeQ('[data-val="all"]', t('filter.all'));
-    safeQ('[data-val="visited"]', t('filter.visited'));
-    safeQ('[data-val="embreve"]', t('filter.soon'));
-    safeQ('[data-val="favorites"]', t('filter.favorites'));
-    const searchEl = document.getElementById('search'); if (searchEl) searchEl.placeholder = t('search.placeholder');
-    safeQ('#bairroFilter option[value=""]', t('filter.allNeighborhoods'));
-    safeQ('#estiloFilter option[value=""]', t('filter.allStyles'));
-    safeQ('#desktopModal p', t('desktop.message'));
-    safe('desktopMobileBtn', t('desktop.mobile'));
-    safe('desktopContinueBtn', t('desktop.continue'));
-    safeQ('#thankYouScreen p', t('thankyou'));
-    safeQ('.ranking-page-title', t('ranking.title'));
-    safeQ('.ranking-desc', t('ranking.desc'));
-    safe('rankingClose', t('ranking.back'));
-    safeQ('[data-field="favoritos"]', t('ranking.tab.favorites'));
-    safeQ('[data-field="visitados"]', t('ranking.tab.visited'));
-    safeQ('[data-field="embreve"]', t('ranking.tab.soon'));
-    safeQ('#aiRecommendOverlay h2', t('ai.title'));
-    safeQ('#aiRecommendAskBlock p', t('ai.desc'));
-    const aiInput = document.getElementById('aiRecommendInput'); if (aiInput) aiInput.placeholder = t('ai.placeholder');
-    safeQ('#aiRecommendForm button[type="submit"]', t('ai.submit'));
-    safeQ('#aiRecommendResultBlock p', t('ai.result'));
-    safe('aiRecommendCloseResult', t('ai.close'));
-    safeQ('#passwordStep p', t('gate.restricted'));
-    const gpEl = document.getElementById('gatePassword'); if (gpEl) gpEl.placeholder = t('gate.password');
-    safe('gateOver18Label', t('gate.over18'));
-    safeQ('#gateForm button[type="submit"]', t('gate.submit'));
-    safe('langModalTitle', t('lang.title'));
-    document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
-    render();
-    renderAccountBar();
-    if (detailBar) openBarDetail(detailBar._id);
-  }
 
   const THEME_KEY = 'garimpa_theme';
   function getCurrentTheme() { return localStorage.getItem(THEME_KEY) || 'dark'; }
@@ -1467,6 +1495,7 @@
           <span class="account-name">${currentReg.nome}</span>
           <button id="editNomeBtn">${t('account.editName')}</button>
           <button id="themeToggleBtn">${getCurrentTheme() === 'light' ? t('account.darkMode') : t('account.lightMode')}</button>
+          <button id="langMenuBtn">${t('nav.language')}</button>
           <button id="logoutBtn">${t('account.logout')}</button>
         </div>
       `;
@@ -1493,6 +1522,12 @@
         toggleTheme();
         accountMenu.classList.remove('open');
       });
+      document.getElementById('langMenuBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        accountMenu.classList.remove('open');
+        document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
+        langModal.classList.remove('hidden');
+      });
       document.getElementById('logoutBtn').addEventListener('click', () => {
         window.trackEvent('logout');
         localStorage.removeItem(REG_KEY);
@@ -1509,6 +1544,8 @@
       });
     }
   }
+  window.renderAccountBar = renderAccountBar;
+  window.getCurrentUserName = () => currentReg ? currentReg.nome : '';
 
   const cadastroBlocks = {
     register: cadastroRegisterBlock,
@@ -1850,12 +1887,87 @@
     gateEl.classList.add('hidden');
   }
 
-  if (localStorage.getItem(BYPASS_KEY) === 'ok') {
-    window.garimpaBypass = true;
-    gateEl.classList.add('hidden');
-  } else if (localStorage.getItem(GATE_KEY) === 'ok') {
-    gateEl.classList.add('hidden');
+  function encodeSharePayload(name, favIds, visIds, embIds) {
+    var nameBytes = unescape(encodeURIComponent(name));
+    var nl = nameBytes.length;
+    var bytes = new Uint8Array(1 + nl + 24);
+    bytes[0] = nl;
+    for (var i = 0; i < nl; i++) bytes[1 + i] = nameBytes.charCodeAt(i);
+    function setBits(offset, ids) {
+      ids.forEach(function(id) { if (id >= 0 && id < 64) bytes[offset + Math.floor(id / 8)] |= (1 << (id % 8)); });
+    }
+    setBits(1 + nl,      favIds);
+    setBits(1 + nl + 8,  visIds);
+    setBits(1 + nl + 16, embIds);
+    return btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   }
+  function decodeSharePayload(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    var raw = atob(str);
+    var bytes = [];
+    for (var i = 0; i < raw.length; i++) bytes.push(raw.charCodeAt(i));
+    var nl = bytes[0];
+    var name = decodeURIComponent(escape(raw.slice(1, 1 + nl)));
+    function getBits(offset) {
+      var ids = [];
+      for (var bi = 0; bi < 8; bi++) {
+        var b = bytes[offset + bi] || 0;
+        for (var bit = 0; bit < 8; bit++) { if (b & (1 << bit)) ids.push(bi * 8 + bit); }
+      }
+      return ids;
+    }
+    return { n: name, f: getBits(1 + nl), v: getBits(1 + nl + 8), e: getBits(1 + nl + 16) };
+  }
+  (function() {
+    try {
+      var sp = new URLSearchParams(location.search).get('share');
+      if (sp) window.sharedListData = decodeSharePayload(sp);
+    } catch(e) {}
+  })();
+  const langFirstOverlay = document.getElementById('langFirstOverlay');
+  const isFirstTimeVisit = !window.sharedListData
+    && localStorage.getItem(GATE_KEY) !== 'ok'
+    && localStorage.getItem(BYPASS_KEY) !== 'ok';
+
+  if (window.sharedListData) {
+    grantBypass();
+    langFirstOverlay.classList.add('hidden');
+  } else if (isFirstTimeVisit) {
+    gateEl.classList.add('hidden');
+    // langFirstOverlay stays visible
+  } else {
+    langFirstOverlay.classList.add('hidden');
+    if (localStorage.getItem(BYPASS_KEY) === 'ok') {
+      window.garimpaBypass = true;
+      gateEl.classList.add('hidden');
+    } else if (localStorage.getItem(GATE_KEY) === 'ok') {
+      gateEl.classList.add('hidden');
+    }
+  }
+
+  var langFirstMode = 'gate';
+
+  document.querySelectorAll('.lang-first-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      localStorage.setItem(LANG_KEY, btn.dataset.lang);
+      applyI18n();
+      langFirstOverlay.classList.add('hidden');
+      langFirstOverlay.removeAttribute('data-closeable');
+      if (langFirstMode === 'gate') gateEl.classList.remove('hidden');
+    });
+  });
+
+  document.getElementById('langFirstClose').addEventListener('click', function() {
+    langFirstOverlay.classList.add('hidden');
+    langFirstOverlay.removeAttribute('data-closeable');
+  });
+
+  document.getElementById('langPermanentBtn').addEventListener('click', function() {
+    langFirstMode = 'change';
+    langFirstOverlay.setAttribute('data-closeable', '');
+    langFirstOverlay.classList.remove('hidden');
+  });
 
   const ONBOARDING_KEY = 'garimpa_onboarding_seen';
   const onboardingOverlay = document.getElementById('onboardingOverlay');
@@ -1869,7 +1981,7 @@
   function renderOnboardingStep() {
     onboardingSteps.forEach((el, i) => el.classList.toggle('hidden', i !== onboardingStep));
     onboardingDots.forEach((el, i) => el.classList.toggle('active', i === onboardingStep));
-    onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? 'Entendi' : 'Próximo';
+    onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? t('onboarding.done') : t('onboarding.next');
     onboardingBackBtn.classList.toggle('hidden', onboardingStep === 0);
   }
 
@@ -1897,27 +2009,51 @@
   const rankingTabs = rankingPage.querySelectorAll('.ranking-tab');
   let rankingField = 'favoritos';
 
-  const RANKING_STATIC = {
-    favoritos: ['Regô', 'Picco', 'Fel', 'Guarita'],
-    visitados: ['Regô', 'Santana', 'Picco', 'Cordial', 'Fel'],
-    embreve: ['Dopa Bar', 'Matiz', 'Água e Biscoito', 'Bar dos Arcos'],
-  };
+  function updateMyListTabCounts() {
+    var shared = window.sharedListData;
+    var counts = {
+      favoritos: shared ? (shared.f || []).length : favoritos.size,
+      visitados: shared ? (shared.v || []).length : visitados.size,
+      embreve:   shared ? (shared.e || []).length : embreve.size,
+    };
+    var labels = { favoritos: t('ranking.tab.favorites'), visitados: t('ranking.tab.visited'), embreve: t('ranking.tab.soon') };
+    rankingTabs.forEach(function(tab) {
+      var field = tab.dataset.field;
+      tab.textContent = labels[field] + ' (' + counts[field] + ')';
+    });
+  }
 
-  function renderRanking() {
-    const bars = RANKING_STATIC[rankingField] || [];
-    rankingList.innerHTML = bars.map((name, i) => `
-      <div class="ranking-item" data-bar-name="${name}">
-        <span class="ranking-rank">${i + 1}º</span>
-        <span class="ranking-name">${name}</span>
-        <span class="ranking-arrow">›</span>
-      </div>
-    `).join('');
+  function updateMyListTitle() {
+    var el = document.getElementById('myListTitle');
+    if (!el) return;
+    var shared = window.sharedListData;
+    var name = shared ? (shared.n || '') : (window.getCurrentUserName ? window.getCurrentUserName() : '');
+    el.textContent = name ? t('ranking.title', {name: name}) : t('nav.ranking');
+  }
+
+  function renderMyList() {
+    var shared = window.sharedListData;
+    var ids;
+    if (shared) {
+      ids = shared[rankingField === 'favoritos' ? 'f' : rankingField === 'visitados' ? 'v' : 'e'] || [];
+    } else {
+      if (rankingField === 'favoritos') ids = [...favoritos];
+      else if (rankingField === 'visitados') ids = [...visitados];
+      else ids = [...embreve];
+    }
+    var bars = ids.map(id => data.find(b => b._id === id)).filter(Boolean);
+    bars.sort((a, b) => a.bar.localeCompare(b.bar));
+    var emptyMsg = rankingField === 'favoritos' ? t('empty.favorites') : rankingField === 'visitados' ? t('empty.visited') : t('empty.soon');
+    rankingList.innerHTML = bars.length
+      ? bars.map((b, i) => `
+          <div class="ranking-item" data-bar-id="${b._id}">
+            <span class="ranking-rank">${i + 1}º</span>
+            <span class="ranking-name">${escapeHtml(b.bar)}</span>
+            <span class="ranking-arrow">›</span>
+          </div>`).join('')
+      : `<p class="ranking-empty">${emptyMsg}</p>`;
     rankingList.querySelectorAll('.ranking-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const barName = item.dataset.barName;
-        const bar = data.find(b => b.bar && b.bar.trim() === barName.trim());
-        if (bar) openBarDetail(bar._id);
-      });
+      item.addEventListener('click', () => openBarDetail(+item.dataset.barId));
     });
   }
 
@@ -1926,24 +2062,35 @@
       rankingTabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
       rankingField = tab.dataset.field;
-      renderRanking();
+      renderMyList();
     });
   });
 
   rankingBtn.addEventListener('click', () => {
-    if (window.trackEvent) window.trackEvent('ranking_open');
+    if (window.trackEvent) window.trackEvent('mylist_open');
     rankingField = 'favoritos';
     rankingTabs.forEach(t => t.classList.toggle('active', t.dataset.field === 'favoritos'));
-    renderRanking();
+    document.getElementById('myListShareBtn').classList.remove('hidden');
+    updateMyListTitle();
+    updateMyListTabCounts();
+    renderMyList();
     rankingPage.classList.remove('hidden');
   });
   rankingClose.addEventListener('click', () => rankingPage.classList.add('hidden'));
 
-  const langModal = document.getElementById('langModal');
-  document.getElementById('langBtn').addEventListener('click', () => {
-    document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()));
-    langModal.classList.remove('hidden');
+  document.getElementById('myListShareBtn').addEventListener('click', () => {
+    var name = window.getCurrentUserName ? window.getCurrentUserName() : '';
+    var encoded = encodeSharePayload(name, [...favoritos], [...visitados], [...embreve]);
+    var url = location.origin + location.pathname + '?share=' + encoded;
+    var msg = t('mylist.shareMsg');
+    if (navigator.share) {
+      navigator.share({text: msg, url: url}).catch(function() {});
+    } else {
+      navigator.clipboard.writeText(msg + '\n' + url).catch(function() {});
+    }
   });
+
+  const langModal = document.getElementById('langModal');
   langModal.addEventListener('click', (e) => { if (e.target === langModal) langModal.classList.add('hidden'); });
   document.querySelectorAll('.lang-option').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2192,7 +2339,7 @@
     detailBarName.textContent = b.bar;
     detailMeta.innerHTML = `
       ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
-      ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
+      ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(tCat(b.estilo))}</button>` : ''}
       ${b.endereco ? `<span class="meta-address">${escapeHtml(b.endereco)}${b.bairro ? ' · ' + escapeHtml(b.bairro) : ''}</span>` : ''}
     `;
     detailMeta.querySelectorAll('[data-action="estilo"]').forEach(btn => {
@@ -2268,6 +2415,148 @@
     return (s || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
 
+  var LANG_KEY = 'garimpa_lang';
+  var TRANSLATIONS = {
+    pt: {
+      'nav.howToStart':'Como começar','nav.ranking':'Minha lista','nav.language':'Idioma',
+      'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
+      'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
+      'search.placeholder':'Pesquise por bar, bairro ou categoria.','filter.allNeighborhoods':'Todos os Bairros','filter.allStyles':'Todas as Categorias',
+      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir em breve','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
+      'count.results':'{n} resultado(s){extra} — Listados em ordem alfabética.',
+      'empty.noResults':'Nenhum bar encontrado 🙁','empty.favorites':'Você ainda não favoritou nenhum bar. Toque no ♡ de um card para adicionar.','empty.visited':'Você ainda não marcou nenhum bar como visitado. Toque no pin de um card para marcar.','empty.soon':'Você ainda não marcou nenhum bar como "ir em breve". Toque no 🔖 de um card para marcar.',
+      'detail.instagram':'Instagram','detail.visited':'Visitei','detail.soon':'Em Breve','detail.favorite':'Favorito',
+      'novidade.badge':'✨ Novidade','novidade.link':'Ver post no Instagram ↗',
+      'ranking.title':'Lista de {name}','ranking.back':'← Voltar','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir em Breve',
+      'mylist.share':'Compartilhar','mylist.shareMsg':'Crie sua conta no Garimpa Drink e visualize a lista de bares que eu criei e te indico','mylist.alphaNote':'Selecionados e organizados por ordem alfabética.',
+      'lang.title':'Escolha o idioma',
+      'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
+      'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
+      'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
+      'cat.Alta Coquetelaria':'Alta Coquetelaria','cat.Bar Balada':'Bar com Música','cat.Bar Balcão':'Bar Balcão','cat.Bar Boteco':'Bar "Boteco"','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurante','cat.Speakeasy':'Speakeasy',
+      'header.subtitle':'O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) ',
+      'header.age':'Destinado para maiores de 18 anos.',
+      'onboarding.step0.title':'Boas vindas ao Garimpa Drink!','onboarding.step0.text':'Esperamos que aproveite muito e que beba com moderação. 😊',
+      'onboarding.step1.title':'Veja o Instagram do bar','onboarding.step1.text':'Toque no ícone do Instagram em qualquer card pra abrir o perfil do bar.',
+      'onboarding.step2.title':'Marque os bares que você já foi','onboarding.step2.text':'Toque no pin pra marcar os bares que você já visitou e acompanhar seu progresso.',
+      'onboarding.step3.title':'Salve os bares que você quer ir em breve','onboarding.step3.text':'Toque no marcador pra guardar os bares que você ainda quer conhecer.',
+      'onboarding.step4.title':'Favorite seus preferidos','onboarding.step4.text':'Toque no coração pra favoritar os bares que você mais ama.',
+      'onboarding.next':'Próximo','onboarding.done':'Entendi','onboarding.back':'Voltar',
+    },
+    en: {
+      'nav.howToStart':'How to start','nav.ranking':'My list','nav.language':'Language',
+      'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
+      'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
+      'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
+      'search.placeholder':'Search by bar, neighborhood or category.','filter.allNeighborhoods':'All Neighborhoods','filter.allStyles':'All Categories',
+      'count.visited':' — visited: {v} of {t}','count.soon':' — 🔖 {n} going soon','count.favorites':' — ♥ {n} favorite(s)','count.all':' — visited: {v} of {t}',
+      'count.results':'{n} result(s){extra} — Listed alphabetically.',
+      'empty.noResults':'No bars found 🙁','empty.favorites':"You haven't favorited any bar yet. Tap ♡ on a card to add.",'empty.visited':"You haven't marked any bar as visited. Tap the pin on a card.",'empty.soon':"You have no bars on your going-soon list. Tap 🔖 on a card.",
+      'detail.instagram':'Instagram','detail.visited':'Visited','detail.soon':'Going Soon','detail.favorite':'Favorite',
+      'novidade.badge':'✨ New','novidade.link':'View post on Instagram ↗',
+      'ranking.title':'{name}\'s list','ranking.back':'← Back','ranking.tab.favorites':'Favorites','ranking.tab.visited':'Visited','ranking.tab.soon':'Going Soon',
+      'mylist.share':'Share','mylist.shareMsg':'Create an account on Garimpa Drink and see the bar list I put together for you','mylist.alphaNote':'Selected and organized alphabetically.',
+      'lang.title':'Choose language',
+      'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
+      'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
+      'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
+      'cat.Alta Coquetelaria':'Craft Cocktails','cat.Bar Balada':'Party Bar','cat.Bar Balcão':'Cocktail Counter','cat.Bar Boteco':'Boteco Bar','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurant','cat.Speakeasy':'Speakeasy',
+      'header.subtitle':'The most interesting cocktail bar guide in São Paulo.<br>(Coming soon to other cities :)<br>By Giovanni Lucas :) ',
+      'header.age':'For adults 18 and over.',
+      'onboarding.step0.title':'Welcome to Garimpa Drink!','onboarding.step0.text':'We hope you enjoy it and drink responsibly. 😊',
+      'onboarding.step1.title':'Check out the bar\'s Instagram','onboarding.step1.text':'Tap the Instagram icon on any card to open the bar\'s profile.',
+      'onboarding.step2.title':'Mark the bars you\'ve been to','onboarding.step2.text':'Tap the pin to mark the bars you\'ve visited and track your progress.',
+      'onboarding.step3.title':'Save bars you want to visit soon','onboarding.step3.text':'Tap the bookmark to save bars you still want to explore.',
+      'onboarding.step4.title':'Favorite your top picks','onboarding.step4.text':'Tap the heart to favorite the bars you love the most.',
+      'onboarding.next':'Next','onboarding.done':'Got it','onboarding.back':'Back',
+    },
+    es: {
+      'nav.howToStart':'Cómo empezar','nav.ranking':'Mi lista','nav.language':'Idioma',
+      'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
+      'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
+      'search.placeholder':'Buscar por bar, barrio o categoría.','filter.allNeighborhoods':'Todos los barrios','filter.allStyles':'Todas las categorías',
+      'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir pronto','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
+      'count.results':'{n} resultado(s){extra} — Listados alfabéticamente.',
+      'empty.noResults':'No se encontraron bares 🙁','empty.favorites':'Aún no marcaste ningún bar como favorito. Toca ♡ en una tarjeta.','empty.visited':'Aún no marcaste ningún bar como visitado. Toca el pin en una tarjeta.','empty.soon':"No tienes bares en tu lista de ir pronto. Toca 🔖 en una tarjeta.",
+      'detail.instagram':'Instagram','detail.visited':'Visitado','detail.soon':'Ir pronto','detail.favorite':'Favorito',
+      'novidade.badge':'✨ Novedad','novidade.link':'Ver publicación en Instagram ↗',
+      'ranking.title':'Lista de {name}','ranking.back':'← Volver','ranking.tab.favorites':'Favoritos','ranking.tab.visited':'Visitados','ranking.tab.soon':'Ir pronto',
+      'mylist.share':'Compartir','mylist.shareMsg':'Crea tu cuenta en Garimpa Drink y visualiza la lista de bares que te recomiendo','mylist.alphaNote':'Seleccionados y organizados alfabéticamente.',
+      'lang.title':'Elige el idioma',
+      'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
+      'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
+      'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
+      'cat.Alta Coquetelaria':'Coctelería de Autor','cat.Bar Balada':'Bar con Música','cat.Bar Balcão':'Bar con Barra','cat.Bar Boteco':'Bar "Boteco"','cat.Listening Bar':'Listening Bar','cat.Restaurante':'Restaurante','cat.Speakeasy':'Speakeasy',
+      'header.subtitle':'La guía de bares de cócteles más interesante de São Paulo.<br>(Próximamente en otras ciudades :)<br>Por Giovanni Lucas :) ',
+      'header.age':'Destinado a mayores de 18 años.',
+      'onboarding.step0.title':'¡Bienvenido a Garimpa Drink!','onboarding.step0.text':'Esperamos que lo disfrutes y bebas con moderación. 😊',
+      'onboarding.step1.title':'Ve el Instagram del bar','onboarding.step1.text':'Toca el ícono de Instagram en cualquier tarjeta para abrir el perfil del bar.',
+      'onboarding.step2.title':'Marca los bares que ya visitaste','onboarding.step2.text':'Toca el pin para marcar los bares que ya visitaste y seguir tu progreso.',
+      'onboarding.step3.title':'Guarda los bares que quieres visitar pronto','onboarding.step3.text':'Toca el marcador para guardar los bares que aún quieres conocer.',
+      'onboarding.step4.title':'Marca tus favoritos','onboarding.step4.text':'Toca el corazón para marcar como favoritos los bares que más te gustan.',
+      'onboarding.next':'Siguiente','onboarding.done':'Entendido','onboarding.back':'Volver',
+    },
+  };
+  function getCurrentLang() { return localStorage.getItem(LANG_KEY) || 'pt'; }
+  function t(key, vars) {
+    var lang = getCurrentLang();
+    var s = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['pt'][key] || key;
+    if (vars) Object.keys(vars).forEach(function(k) { s = s.replace('{'+k+'}', vars[k]); });
+    return s;
+  }
+  function tCat(estilo) { return estilo ? (t('cat.' + estilo) || estilo) : ''; }
+  function applyI18n() {
+    var safe = function(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
+    var safeQ = function(sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
+    safe('howToStartBtn', t('nav.howToStart'));
+    safe('rankingBtn', t('nav.ranking'));
+    safe('aiRecommendBtn', t('header.ai'));
+    safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
+    safeQ('[data-val="all"]', t('filter.all'));
+    safeQ('[data-val="visited"]', t('filter.visited'));
+    safeQ('[data-val="embreve"]', t('filter.soon'));
+    safeQ('[data-val="favorites"]', t('filter.favorites'));
+    var searchEl = document.getElementById('search'); if (searchEl) searchEl.placeholder = t('search.placeholder');
+    safeQ('#bairroFilter option[value=""]', t('filter.allNeighborhoods'));
+    safeQ('#estiloFilter option[value=""]', t('filter.allStyles'));
+    document.querySelectorAll('#estiloFilter option:not([value=""])').forEach(function(opt) { opt.textContent = tCat(opt.value); });
+    safeQ('#desktopModal p', t('desktop.message'));
+    safe('desktopMobileBtn', t('desktop.mobile'));
+    safe('desktopContinueBtn', t('desktop.continue'));
+    safeQ('#thankYouScreen p', t('thankyou'));
+    updateMyListTitle();
+    safe('myListShareBtn', t('mylist.share'));
+    safe('rankingClose', t('ranking.back'));
+    updateMyListTabCounts();
+    safe('myListAlphaNote', t('mylist.alphaNote'));
+    safeQ('#aiRecommendOverlay h2', t('ai.title'));
+    safeQ('#aiRecommendAskBlock p', t('ai.desc'));
+    var aiInput = document.getElementById('aiRecommendInput'); if (aiInput) aiInput.placeholder = t('ai.placeholder');
+    safeQ('#aiRecommendForm button[type="submit"]', t('ai.submit'));
+    safeQ('#aiRecommendResultBlock p', t('ai.result'));
+    safe('aiRecommendCloseResult', t('ai.close'));
+    safeQ('#passwordStep p', t('gate.restricted'));
+    var gpEl = document.getElementById('gatePassword'); if (gpEl) gpEl.placeholder = t('gate.password');
+    safe('gateOver18Label', t('gate.over18'));
+    safeQ('#gateForm button[type="submit"]', t('gate.submit'));
+    safe('langModalTitle', t('lang.title'));
+    safe('langPermanentBtn', t('nav.language'));
+    document.querySelectorAll('.lang-option').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()); });
+    var subtitleEl = document.getElementById('subtitleText'); if (subtitleEl) subtitleEl.innerHTML = t('header.subtitle');
+    safe('subtitleAge', t('header.age'));
+    safeQ('[data-step="0"] h2', t('onboarding.step0.title')); safeQ('[data-step="0"] p', t('onboarding.step0.text'));
+    safeQ('[data-step="1"] h2', t('onboarding.step1.title')); safeQ('[data-step="1"] p', t('onboarding.step1.text'));
+    safeQ('[data-step="2"] h2', t('onboarding.step2.title')); safeQ('[data-step="2"] p', t('onboarding.step2.text'));
+    safeQ('[data-step="3"] h2', t('onboarding.step3.title')); safeQ('[data-step="3"] p', t('onboarding.step3.text'));
+    safeQ('[data-step="4"] h2', t('onboarding.step4.title')); safeQ('[data-step="4"] p', t('onboarding.step4.text'));
+    safe('onboardingBackBtn', t('onboarding.back'));
+    render();
+    if (window.renderAccountBar) window.renderAccountBar();
+    if (detailBar) openBarDetail(detailBar._id);
+  }
+
   function render() {
     const q = normalize(searchInput.value.trim());
     const bairro = bairroFilter.value;
@@ -2320,7 +2609,7 @@
         </div>
         <div class="meta">
           ${b.bairro ? `<button class="estilo-pill" data-action="bairro" data-bairro="${escapeHtml(b.bairro)}">${escapeHtml(b.bairro)}</button>` : ''}
-          ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(b.estilo)}</button>` : ''}
+          ${b.estilo ? `<button class="estilo-pill" data-action="estilo" data-estilo="${escapeHtml(b.estilo)}">${escapeHtml(tCat(b.estilo))}</button>` : ''}
           ${b.novidadePost ? `<span class="novidade-badge">${t('novidade.badge')}</span>` : ''}
         </div>
       </div>
@@ -2500,6 +2789,16 @@
   });
 
   applyI18n();
+
+  if (window.sharedListData) {
+    rankingField = 'favoritos';
+    rankingTabs.forEach(function(tab) { tab.classList.toggle('active', tab.dataset.field === 'favoritos'); });
+    document.getElementById('myListShareBtn').classList.add('hidden');
+    updateMyListTitle();
+    updateMyListTabCounts();
+    renderMyList();
+    rankingPage.classList.remove('hidden');
+  }
 </script>
 <script async src="https://www.instagram.com/embed.js"></script>
 </body>
