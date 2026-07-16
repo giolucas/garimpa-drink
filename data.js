@@ -21,7 +21,6 @@ const BARES = [
   { visitado: true, bar: "Raio que o Parta", instagram: "https://www.instagram.com/raioqueoparta.bar", bairro: "Barra Funda", estilo: "Restaurante", lat: -23.5271, lng: -46.6621, endereco: "R. Margarida, 30" },
   { visitado: false, bar: "Bandeira Bandeira", instagram: "https://www.instagram.com/bandeirabandeirabar", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52567, lng: -46.66516, endereco: "R. Sousa Lima, 81" },
   { visitado: true, bar: "Suei", instagram: "https://www.instagram.com/suei.sp", bairro: "Barra Funda", estilo: "Bar Balada", lat: -23.52969, lng: -46.66337, endereco: "R. Sousa Lima, 328" },
-  { visitado: true, bar: "Pina", instagram: "https://www.instagram.com/pina.drinques", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52472, lng: -46.66177, endereco: "R. Brigadeiro Galvão, 177" },
   { visitado: true, bar: "Pininha", instagram: "https://www.instagram.com/pininha.drinques", bairro: "Barra Funda", estilo: "Bar Balcão", lat: -23.52768, lng: -46.6669 },
   { visitado: true, bar: "Trago", instagram: "https://www.instagram.com/trago_bar", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52907, lng: -46.6605, endereco: "R. Souza Lima, 174" },
   { visitado: true, bar: "Água e Biscoito", instagram: "https://www.instagram.com/aguaebiscoito", bairro: "Barra Funda", estilo: "Listening Bar", lat: -23.52327, lng: -46.66463, endereco: "R. Dr. Sérgio Meira, 120" },
