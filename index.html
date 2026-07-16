@@ -2021,11 +2021,7 @@
     onboardingOverlay.classList.remove('hidden');
   }
 
-  document.getElementById('howToStartBtn').addEventListener('click', () => {
-    if (window.trackEvent) window.trackEvent('onboarding_manual_open');
-    setNavActive('howToStartBtn');
-    showOnboarding(true);
-  });
+
 
   const rankingBtn = document.getElementById('rankingBtn');
   const rankingPage = document.getElementById('rankingPage');
