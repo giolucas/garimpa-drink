@@ -57,7 +57,7 @@
   .sticky-top {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 1300;
     background: var(--bg);
     height: 46px;
     padding: 0 16px;
@@ -493,8 +493,8 @@
   }
   .lang-first-close {
     position: absolute;
-    top: 16px;
-    right: 20px;
+    top: 12px;
+    right: 14px;
     background: transparent;
     border: none;
     color: var(--muted);
@@ -1007,7 +1007,7 @@
   #langFirstOverlay {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    background: rgba(0,0,0,0.72);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1018,10 +1018,14 @@
   .lang-first-box {
     width: 100%;
     max-width: 340px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    position: relative;
   }
   .lang-first-title {
     font-size: 26px;
@@ -1124,9 +1128,9 @@
 <div id="thankYouScreen" class="hidden">
   <p>Obrigado! :)</p>
 </div>
-<div id="langFirstOverlay" style="position:relative">
-  <button type="button" class="lang-first-close" id="langFirstClose">&times;</button>
+<div id="langFirstOverlay">
   <div class="lang-first-box">
+    <button type="button" class="lang-first-close" id="langFirstClose">&times;</button>
     <div class="mylist-brand">
       <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
       <span class="mylist-brand-name">Garimpa Drink</span>
