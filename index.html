@@ -1179,7 +1179,7 @@
     <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
     <h1>Garimpa Drink</h1>
   </div>
-  <div class="subtitle">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) <a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice">Destinado para maiores de 18 anos.</span></div>
+  <div class="subtitle"><span id="subtitleText">O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) </span><a href="https://www.instagram.com/ehogiomesmo/" target="_blank" rel="noopener">@ehogiomesmo</a><span class="age-notice" id="subtitleAge">Destinado para maiores de 18 anos.</span></div>
   <input type="text" id="search" placeholder="Pesquise por bar, bairro ou categoria.">
   <div class="filters">
     <select id="bairroFilter"><option value="">Todos os Bairros</option></select>
@@ -1773,7 +1773,7 @@
   function renderOnboardingStep() {
     onboardingSteps.forEach((el, i) => el.classList.toggle('hidden', i !== onboardingStep));
     onboardingDots.forEach((el, i) => el.classList.toggle('active', i === onboardingStep));
-    onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? 'Entendi' : 'Próximo';
+    onboardingNextBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? t('onboarding.done') : t('onboarding.next');
     onboardingBackBtn.classList.toggle('hidden', onboardingStep === 0);
   }
 
@@ -2186,6 +2186,14 @@
       'desktop.message':'A experiência de uso do Garimpa Drink, por ser beta, foi criada pensando exclusivamente para o acesso pelo celular.','desktop.mobile':'Ok, vou acessar pelo celular.','desktop.continue':'Desejo continuar pelo desktop','thankyou':'Obrigado! :)',
       'ai.title':'Me indique um bar','ai.desc':'Descreva o que você procura (estilo, bairro, ocasião) e a gente sugere um bar da nossa lista.','ai.placeholder':'Ex: bar intimista em Pinheiros pra um encontro','ai.submit':'Buscar sugestão','ai.result':'Estamos testando essa funcionalidade! Anotamos seu pedido e em breve você recebe sugestões por aqui 👀','ai.close':'Fechar',
       'gate.restricted':'Acesso restrito. Digite a senha para entrar.','gate.password':'Senha','gate.over18':'Declaro que sou maior de 18 anos.','gate.submit':'Entrar',
+      'header.subtitle':'O guia de bar de drinks mais interessante de São Paulo.<br>(Em breve em outras cidades :)<br>Por Giovanni Lucas :) ',
+      'header.age':'Destinado para maiores de 18 anos.',
+      'onboarding.step0.title':'Boas vindas ao Garimpa Drink!','onboarding.step0.text':'Esperamos que aproveite muito e que beba com moderação. 😊',
+      'onboarding.step1.title':'Veja o Instagram do bar','onboarding.step1.text':'Toque no ícone do Instagram em qualquer card pra abrir o perfil do bar.',
+      'onboarding.step2.title':'Marque os bares que você já foi','onboarding.step2.text':'Toque no pin pra marcar os bares que você já visitou e acompanhar seu progresso.',
+      'onboarding.step3.title':'Salve os bares que você quer ir em breve','onboarding.step3.text':'Toque no marcador pra guardar os bares que você ainda quer conhecer.',
+      'onboarding.step4.title':'Favorite seus preferidos','onboarding.step4.text':'Toque no coração pra favoritar os bares que você mais ama.',
+      'onboarding.next':'Próximo','onboarding.done':'Entendi','onboarding.back':'Voltar',
     },
     en: {
       'nav.howToStart':'How to start','nav.ranking':'Bar ranking','nav.language':'Language',
@@ -2203,6 +2211,14 @@
       'desktop.message':'The Garimpa Drink experience, being in beta, was created exclusively for mobile access.','desktop.mobile':"Ok, I'll use my phone.",'desktop.continue':'Continue on desktop','thankyou':'Thank you! :)',
       'ai.title':'Suggest me a bar','ai.desc':"Describe what you're looking for (style, neighborhood, occasion) and we'll suggest a bar.",'ai.placeholder':'E.g.: intimate bar in Pinheiros for a date','ai.submit':'Search','ai.result':"We're testing this feature! We noted your request and you'll soon receive suggestions 👀",'ai.close':'Close',
       'gate.restricted':'Restricted access. Enter the password to continue.','gate.password':'Password','gate.over18':'I confirm I am over 18 years old.','gate.submit':'Enter',
+      'header.subtitle':'The most interesting cocktail bar guide in São Paulo.<br>(Coming soon to other cities :)<br>By Giovanni Lucas :) ',
+      'header.age':'For adults 18 and over.',
+      'onboarding.step0.title':'Welcome to Garimpa Drink!','onboarding.step0.text':'We hope you enjoy it and drink responsibly. 😊',
+      'onboarding.step1.title':'Check out the bar\'s Instagram','onboarding.step1.text':'Tap the Instagram icon on any card to open the bar\'s profile.',
+      'onboarding.step2.title':'Mark the bars you\'ve been to','onboarding.step2.text':'Tap the pin to mark the bars you\'ve visited and track your progress.',
+      'onboarding.step3.title':'Save bars you want to visit soon','onboarding.step3.text':'Tap the bookmark to save bars you still want to explore.',
+      'onboarding.step4.title':'Favorite your top picks','onboarding.step4.text':'Tap the heart to favorite the bars you love the most.',
+      'onboarding.next':'Next','onboarding.done':'Got it','onboarding.back':'Back',
     },
     es: {
       'nav.howToStart':'Cómo empezar','nav.ranking':'Ranking de bares','nav.language':'Idioma',
@@ -2220,6 +2236,14 @@
       'desktop.message':'La experiencia de Garimpa Drink, al ser beta, fue creada exclusivamente para acceso por celular.','desktop.mobile':'Ok, voy a usar mi celular.','desktop.continue':'Quiero continuar en el escritorio','thankyou':'¡Gracias! :)',
       'ai.title':'Recomiéndame un bar','ai.desc':'Describe lo que buscas (estilo, barrio, ocasión) y te sugerimos un bar.','ai.placeholder':'Ej: bar íntimo en Pinheiros para una cita','ai.submit':'Buscar','ai.result':'¡Estamos probando esta función! Anotamos tu pedido y pronto recibirás sugerencias 👀','ai.close':'Cerrar',
       'gate.restricted':'Acceso restringido. Introduce la contraseña para continuar.','gate.password':'Contraseña','gate.over18':'Declaro que tengo más de 18 años.','gate.submit':'Entrar',
+      'header.subtitle':'La guía de bares de cócteles más interesante de São Paulo.<br>(Próximamente en otras ciudades :)<br>Por Giovanni Lucas :) ',
+      'header.age':'Destinado a mayores de 18 años.',
+      'onboarding.step0.title':'¡Bienvenido a Garimpa Drink!','onboarding.step0.text':'Esperamos que lo disfrutes y bebas con moderación. 😊',
+      'onboarding.step1.title':'Ve el Instagram del bar','onboarding.step1.text':'Toca el ícono de Instagram en cualquier tarjeta para abrir el perfil del bar.',
+      'onboarding.step2.title':'Marca los bares que ya visitaste','onboarding.step2.text':'Toca el pin para marcar los bares que ya visitaste y seguir tu progreso.',
+      'onboarding.step3.title':'Guarda los bares que quieres visitar pronto','onboarding.step3.text':'Toca el marcador para guardar los bares que aún quieres conocer.',
+      'onboarding.step4.title':'Marca tus favoritos','onboarding.step4.text':'Toca el corazón para marcar como favoritos los bares que más te gustan.',
+      'onboarding.next':'Siguiente','onboarding.done':'Entendido','onboarding.back':'Volver',
     },
   };
   function getCurrentLang() { return localStorage.getItem(LANG_KEY) || 'pt'; }
@@ -2265,6 +2289,14 @@
     safeQ('#gateForm button[type="submit"]', t('gate.submit'));
     safe('langModalTitle', t('lang.title'));
     document.querySelectorAll('.lang-option').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()); });
+    var subtitleEl = document.getElementById('subtitleText'); if (subtitleEl) subtitleEl.innerHTML = t('header.subtitle');
+    safe('subtitleAge', t('header.age'));
+    safeQ('[data-step="0"] h2', t('onboarding.step0.title')); safeQ('[data-step="0"] p', t('onboarding.step0.text'));
+    safeQ('[data-step="1"] h2', t('onboarding.step1.title')); safeQ('[data-step="1"] p', t('onboarding.step1.text'));
+    safeQ('[data-step="2"] h2', t('onboarding.step2.title')); safeQ('[data-step="2"] p', t('onboarding.step2.text'));
+    safeQ('[data-step="3"] h2', t('onboarding.step3.title')); safeQ('[data-step="3"] p', t('onboarding.step3.text'));
+    safeQ('[data-step="4"] h2', t('onboarding.step4.title')); safeQ('[data-step="4"] p', t('onboarding.step4.text'));
+    safe('onboardingBackBtn', t('onboarding.back'));
     render();
     if (window.renderAccountBar) window.renderAccountBar();
     if (detailBar) openBarDetail(detailBar._id);
