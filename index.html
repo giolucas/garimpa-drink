@@ -1801,10 +1801,42 @@
     gateEl.classList.add('hidden');
   }
 
+  function encodeSharePayload(name, favIds, visIds, embIds) {
+    var nameBytes = unescape(encodeURIComponent(name));
+    var nl = nameBytes.length;
+    var bytes = new Uint8Array(1 + nl + 24);
+    bytes[0] = nl;
+    for (var i = 0; i < nl; i++) bytes[1 + i] = nameBytes.charCodeAt(i);
+    function setBits(offset, ids) {
+      ids.forEach(function(id) { if (id >= 0 && id < 64) bytes[offset + Math.floor(id / 8)] |= (1 << (id % 8)); });
+    }
+    setBits(1 + nl,      favIds);
+    setBits(1 + nl + 8,  visIds);
+    setBits(1 + nl + 16, embIds);
+    return btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+  function decodeSharePayload(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    var raw = atob(str);
+    var bytes = [];
+    for (var i = 0; i < raw.length; i++) bytes.push(raw.charCodeAt(i));
+    var nl = bytes[0];
+    var name = decodeURIComponent(escape(raw.slice(1, 1 + nl)));
+    function getBits(offset) {
+      var ids = [];
+      for (var bi = 0; bi < 8; bi++) {
+        var b = bytes[offset + bi] || 0;
+        for (var bit = 0; bit < 8; bit++) { if (b & (1 << bit)) ids.push(bi * 8 + bit); }
+      }
+      return ids;
+    }
+    return { n: name, f: getBits(1 + nl), v: getBits(1 + nl + 8), e: getBits(1 + nl + 16) };
+  }
   (function() {
     try {
       var sp = new URLSearchParams(location.search).get('share');
-      if (sp) window.sharedListData = JSON.parse(decodeURIComponent(escape(atob(sp))));
+      if (sp) window.sharedListData = decodeSharePayload(sp);
     } catch(e) {}
   })();
   if (window.sharedListData) grantBypass();
@@ -1926,8 +1958,7 @@
 
   document.getElementById('myListShareBtn').addEventListener('click', () => {
     var name = window.getCurrentUserName ? window.getCurrentUserName() : '';
-    var payload = {n: name, f: [...favoritos], v: [...visitados], e: [...embreve]};
-    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    var encoded = encodeSharePayload(name, [...favoritos], [...visitados], [...embreve]);
     var url = location.origin + location.pathname + '?share=' + encoded;
     var msg = t('mylist.shareMsg');
     if (navigator.share) {
@@ -2047,16 +2078,6 @@
   const VISITED_KEY = 'garimpa_visitados_v2';
   const visitedStored = localStorage.getItem(VISITED_KEY);
   let visitados = new Set(visitedStored ? JSON.parse(visitedStored) : []);
-
-  if (window.sharedListData) {
-    rankingField = 'favoritos';
-    rankingTabs.forEach(function(t) { t.classList.toggle('active', t.dataset.field === 'favoritos'); });
-    document.getElementById('myListShareBtn').classList.add('hidden');
-    updateMyListTitle();
-    updateMyListTabCounts();
-    renderMyList();
-    rankingPage.classList.remove('hidden');
-  }
 
   function saveVisitados() {
     localStorage.setItem(VISITED_KEY, JSON.stringify([...visitados]));
@@ -2645,6 +2666,16 @@
   });
 
   applyI18n();
+
+  if (window.sharedListData) {
+    rankingField = 'favoritos';
+    rankingTabs.forEach(function(tab) { tab.classList.toggle('active', tab.dataset.field === 'favoritos'); });
+    document.getElementById('myListShareBtn').classList.add('hidden');
+    updateMyListTitle();
+    updateMyListTabCounts();
+    renderMyList();
+    rankingPage.classList.remove('hidden');
+  }
 </script>
 <script async src="https://www.instagram.com/embed.js"></script>
 </body>
