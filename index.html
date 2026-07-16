@@ -1302,7 +1302,6 @@
   <div class="header-top-row">
     <div class="header-top-actions">
       <button type="button" class="account-login-btn nav-active" id="homeBtn">Home</button>
-      <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
       <button type="button" class="account-login-btn" id="rankingBtn">Minha lista</button>
       <button type="button" class="account-login-btn" id="langPermanentBtn">Idioma</button>
     </div>
@@ -1970,7 +1969,7 @@
     setNavActive('homeBtn');
   });
 
-  var navBtnIds = ['homeBtn', 'howToStartBtn', 'rankingBtn', 'langPermanentBtn'];
+  var navBtnIds = ['homeBtn', 'rankingBtn', 'langPermanentBtn'];
   function setNavActive(id) {
     navBtnIds.forEach(function(bid) {
       var el = document.getElementById(bid);
@@ -2450,7 +2449,7 @@
     pt: {
       'nav.home':'Home','nav.howToStart':'Como começar','nav.ranking':'Minha lista','nav.language':'Idioma',
       'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
-      'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'header.ai':'Como começar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
       'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
       'search.placeholder':'Pesquise por bar, bairro ou categoria.','filter.allNeighborhoods':'Todos os Bairros','filter.allStyles':'Todas as Categorias',
       'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir em breve','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
@@ -2477,7 +2476,7 @@
     en: {
       'nav.home':'Home','nav.howToStart':'How to start','nav.ranking':'My list','nav.language':'Language',
       'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
-      'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
+      'header.ai':'How to start','map.show':'Show map','map.hide':'Hide map',
       'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
       'search.placeholder':'Search by bar, neighborhood or category.','filter.allNeighborhoods':'All Neighborhoods','filter.allStyles':'All Categories',
       'count.visited':' — visited: {v} of {t}','count.soon':' — 🔖 {n} going soon','count.favorites':' — ♥ {n} favorite(s)','count.all':' — visited: {v} of {t}',
@@ -2504,7 +2503,7 @@
     es: {
       'nav.home':'Home','nav.howToStart':'Cómo empezar','nav.ranking':'Mi lista','nav.language':'Idioma',
       'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
-      'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
+      'header.ai':'Cómo empezar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
       'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
       'search.placeholder':'Buscar por bar, barrio o categoría.','filter.allNeighborhoods':'Todos los barrios','filter.allStyles':'Todas las categorías',
       'count.visited':' — visitados: {v} de {t}','count.soon':' — 🔖 {n} ir pronto','count.favorites':' — ♥ {n} favorito(s)','count.all':' — visitados: {v} de {t}',
@@ -2541,7 +2540,6 @@
     var safe = function(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
     var safeQ = function(sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
     safe('homeBtn', t('nav.home'));
-    safe('howToStartBtn', t('nav.howToStart'));
     safe('rankingBtn', t('nav.ranking'));
     safe('aiRecommendBtn', t('header.ai'));
     safe('mapToggleBtn', mapOpen ? t('map.hide') : t('map.show'));
