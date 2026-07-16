@@ -1844,8 +1844,8 @@
   }
 
   aiRecommendBtn.addEventListener('click', () => {
-    window.trackEvent('bar_recommendation_cta_click');
-    aiRecommendOverlay.classList.remove('hidden');
+    if (window.trackEvent) window.trackEvent('onboarding_manual_open');
+    showOnboarding(true);
   });
   aiRecommendClose.addEventListener('click', closeAiRecommend);
   aiRecommendCloseResult.addEventListener('click', closeAiRecommend);
