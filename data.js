@@ -11,6 +11,7 @@ const BARES = [
   { visitado: true, bar: "Virado SP", instagram: "https://www.instagram.com/virado.sp", bairro: "Centro / República", estilo: "Restaurante", lat: -23.54308, lng: -46.64318, endereco: "Largo do Arouche, 130" },
   { visitado: false, bar: "Formosa Hifi", instagram: "https://www.instagram.com/formosahifi", bairro: "Centro / República", estilo: "Listening Bar", lat: -23.54941, lng: -46.6367, endereco: "R. Cel. Xavier de Toledo, 23 – Galeria Formosa" },
   { visitado: true, bar: "Bar dos Arcos", instagram: "https://www.instagram.com/bardosarcos", bairro: "Centro / República", estilo: "Bar Balcão", lat: -23.53994, lng: -46.63724, endereco: "Praça Ramos de Azevedo, s/n" },
+  { visitado: false, bar: "Drosophyla", instagram: "https://www.instagram.com/drosophylabar", bairro: "Centro / República", estilo: "Bar Balada", lat: -23.5432, lng: -46.6388, novidadePost: "https://www.instagram.com/p/Da0jSDNkWlo/?igsh=eGt3d3FqamVib2J1" },
   { visitado: true, bar: "Bargo Mooca", instagram: "https://www.instagram.com/bargomooca", bairro: "Santa Cecília", estilo: "Bar Balcão", lat: -23.5414, lng: -46.6528, endereco: "R. Barão de Tatuí, 302" },
   { visitado: true, bar: "Aconchegante", instagram: "https://www.instagram.com/aconchegante_bar", bairro: "Santa Cecília", estilo: "Restaurante", lat: -23.53997, lng: -46.65586, endereco: "R. Jesuíno Pascoal, 25" },
   { visitado: true, bar: "Das", instagram: "https://www.instagram.com/bar.das.sp", bairro: "Santa Cecília", estilo: "Bar Balcão", lat: -23.54399, lng: -46.65407, endereco: "R. Fortunato, 133" },
