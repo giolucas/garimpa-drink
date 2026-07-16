@@ -559,6 +559,25 @@
   }
   .mylist-share-btn:active { opacity: 0.7; }
   .mylist-share-btn.hidden { display: none; }
+  .mylist-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 14px;
+  }
+  .mylist-brand .logo-mark {
+    width: 52px;
+    height: 52px;
+  }
+  .mylist-brand .logo-mark .sq { width: 29px; height: 29px; }
+  .mylist-brand .logo-mark .ci { width: 24px; height: 24px; }
+  .mylist-brand .logo-mark .ha { width: 16px; height: 8px; }
+  .mylist-brand-name {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
   .ranking-tabs {
     display: flex;
     gap: 6px;
@@ -1170,6 +1189,10 @@
   <div class="ranking-page-inner">
     <div class="ranking-page-topbar">
       <button type="button" id="rankingClose" class="ranking-back-btn">← Voltar</button>
+    </div>
+    <div class="mylist-brand">
+      <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+      <span class="mylist-brand-name">Garimpa Drink</span>
     </div>
     <h2 class="ranking-page-title" id="myListTitle">Minha lista</h2>
     <button type="button" id="myListShareBtn" class="mylist-share-btn">Compartilhar</button>
