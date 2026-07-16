@@ -515,7 +515,7 @@
     font-weight: 600;
     white-space: nowrap;
   }
-  #howToStartBtn {
+  .account-login-btn.nav-active {
     background: var(--magenta);
     border-color: var(--magenta);
     color: #fff;
@@ -1301,6 +1301,7 @@
 <div class="sticky-top">
   <div class="header-top-row">
     <div class="header-top-actions">
+      <button type="button" class="account-login-btn nav-active" id="homeBtn">Home</button>
       <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
       <button type="button" class="account-login-btn" id="rankingBtn">Minha lista</button>
       <button type="button" class="account-login-btn" id="langPermanentBtn">Idioma</button>
@@ -1959,10 +1960,28 @@
       langFirstOverlay.classList.add('hidden');
       langFirstOverlay.removeAttribute('data-closeable');
       if (langFirstMode === 'gate') gateEl.classList.remove('hidden');
+      setNavActive('homeBtn');
     });
   });
 
   document.getElementById('langFirstClose').addEventListener('click', function() {
+    langFirstOverlay.classList.add('hidden');
+    langFirstOverlay.removeAttribute('data-closeable');
+    setNavActive('homeBtn');
+  });
+
+  var navBtnIds = ['homeBtn', 'howToStartBtn', 'rankingBtn', 'langPermanentBtn'];
+  function setNavActive(id) {
+    navBtnIds.forEach(function(bid) {
+      var el = document.getElementById(bid);
+      if (el) el.classList.toggle('nav-active', bid === id);
+    });
+  }
+
+  document.getElementById('homeBtn').addEventListener('click', function() {
+    setNavActive('homeBtn');
+    rankingPage.classList.add('hidden');
+    onboardingOverlay.classList.add('hidden');
     langFirstOverlay.classList.add('hidden');
     langFirstOverlay.removeAttribute('data-closeable');
   });
@@ -1971,6 +1990,7 @@
     langFirstMode = 'change';
     langFirstOverlay.setAttribute('data-closeable', '');
     langFirstOverlay.classList.remove('hidden');
+    setNavActive('langPermanentBtn');
   });
 
   const ONBOARDING_KEY = 'garimpa_onboarding_seen';
@@ -1992,6 +2012,7 @@
   function closeOnboarding() {
     localStorage.setItem(ONBOARDING_KEY, 'ok');
     onboardingOverlay.classList.add('hidden');
+    setNavActive('homeBtn');
   }
 
   function showOnboarding(force) {
@@ -2003,6 +2024,7 @@
 
   document.getElementById('howToStartBtn').addEventListener('click', () => {
     if (window.trackEvent) window.trackEvent('onboarding_manual_open');
+    setNavActive('howToStartBtn');
     showOnboarding(true);
   });
 
@@ -2072,6 +2094,7 @@
 
   rankingBtn.addEventListener('click', () => {
     if (window.trackEvent) window.trackEvent('mylist_open');
+    setNavActive('rankingBtn');
     rankingField = 'favoritos';
     rankingTabs.forEach(t => t.classList.toggle('active', t.dataset.field === 'favoritos'));
     document.getElementById('myListShareBtn').classList.remove('hidden');
@@ -2080,7 +2103,10 @@
     renderMyList();
     rankingPage.classList.remove('hidden');
   });
-  rankingClose.addEventListener('click', () => rankingPage.classList.add('hidden'));
+  rankingClose.addEventListener('click', () => {
+    rankingPage.classList.add('hidden');
+    setNavActive('homeBtn');
+  });
 
   document.getElementById('myListShareBtn').addEventListener('click', () => {
     var name = window.getCurrentUserName ? window.getCurrentUserName() : '';
@@ -2422,7 +2448,7 @@
   var LANG_KEY = 'garimpa_lang';
   var TRANSLATIONS = {
     pt: {
-      'nav.howToStart':'Como começar','nav.ranking':'Minha lista','nav.language':'Idioma',
+      'nav.home':'Home','nav.howToStart':'Como começar','nav.ranking':'Minha lista','nav.language':'Idioma',
       'greeting':'Olá, {name}!','account.editName':'Editar nome','account.lightMode':'Modo claro','account.darkMode':'Modo escuro','account.logout':'Sair',
       'header.ai':'Me indique um bar de drink','map.show':'Ver mapa','map.hide':'Ocultar mapa',
       'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir em Breve','filter.favorites':'Favoritos',
@@ -2449,7 +2475,7 @@
       'onboarding.next':'Próximo','onboarding.done':'Entendi','onboarding.back':'Voltar',
     },
     en: {
-      'nav.howToStart':'How to start','nav.ranking':'My list','nav.language':'Language',
+      'nav.home':'Home','nav.howToStart':'How to start','nav.ranking':'My list','nav.language':'Language',
       'greeting':'Hello, {name}!','account.editName':'Edit name','account.lightMode':'Light mode','account.darkMode':'Dark mode','account.logout':'Log out',
       'header.ai':'Suggest me a bar','map.show':'Show map','map.hide':'Hide map',
       'filter.all':'All','filter.visited':'Visited','filter.soon':'Going Soon','filter.favorites':'Favorites',
@@ -2476,7 +2502,7 @@
       'onboarding.next':'Next','onboarding.done':'Got it','onboarding.back':'Back',
     },
     es: {
-      'nav.howToStart':'Cómo empezar','nav.ranking':'Mi lista','nav.language':'Idioma',
+      'nav.home':'Home','nav.howToStart':'Cómo empezar','nav.ranking':'Mi lista','nav.language':'Idioma',
       'greeting':'¡Hola, {name}!','account.editName':'Editar nombre','account.lightMode':'Modo claro','account.darkMode':'Modo oscuro','account.logout':'Salir',
       'header.ai':'Recomiéndame un bar','map.show':'Ver mapa','map.hide':'Ocultar mapa',
       'filter.all':'Todos','filter.visited':'Visitados','filter.soon':'Ir pronto','filter.favorites':'Favoritos',
@@ -2514,6 +2540,7 @@
   function applyI18n() {
     var safe = function(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
     var safeQ = function(sel, text) { var el = document.querySelector(sel); if (el) el.textContent = text; };
+    safe('homeBtn', t('nav.home'));
     safe('howToStartBtn', t('nav.howToStart'));
     safe('rankingBtn', t('nav.ranking'));
     safe('aiRecommendBtn', t('header.ai'));
