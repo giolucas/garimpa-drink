@@ -983,6 +983,53 @@
     font-weight: 700;
     color: var(--text);
   }
+  #langFirstOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 24px;
+  }
+  #langFirstOverlay.hidden { display: none; }
+  .lang-first-box {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .lang-first-title {
+    font-size: 26px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0;
+  }
+  .lang-first-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  .lang-first-btn {
+    appearance: none;
+    background: var(--card);
+    border: 1.5px solid var(--border2);
+    border-radius: 14px;
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 18px 20px;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .lang-first-btn:active { border-color: var(--magenta); color: var(--magenta); }
   #langModal {
     position: fixed;
     inset: 0;
@@ -1055,6 +1102,20 @@
 </div>
 <div id="thankYouScreen" class="hidden">
   <p>Obrigado! :)</p>
+</div>
+<div id="langFirstOverlay">
+  <div class="lang-first-box">
+    <div class="mylist-brand">
+      <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
+      <span class="mylist-brand-name">Garimpa Drink</span>
+    </div>
+    <h2 class="lang-first-title">Escolha o idioma</h2>
+    <div class="lang-first-options">
+      <button class="lang-first-btn" data-lang="pt">🇧🇷 PT/BR</button>
+      <button class="lang-first-btn" data-lang="en">🇺🇸 ENG/US</button>
+      <button class="lang-first-btn" data-lang="es">🇪🇸 ESP</button>
+    </div>
+  </div>
 </div>
 <div id="gate">
   <div class="gate-box" id="passwordStep">
@@ -1839,13 +1900,35 @@
       if (sp) window.sharedListData = decodeSharePayload(sp);
     } catch(e) {}
   })();
-  if (window.sharedListData) grantBypass();
-  else if (localStorage.getItem(BYPASS_KEY) === 'ok') {
-    window.garimpaBypass = true;
+  const langFirstOverlay = document.getElementById('langFirstOverlay');
+  const isFirstTimeVisit = !window.sharedListData
+    && localStorage.getItem(GATE_KEY) !== 'ok'
+    && localStorage.getItem(BYPASS_KEY) !== 'ok';
+
+  if (window.sharedListData) {
+    grantBypass();
+    langFirstOverlay.classList.add('hidden');
+  } else if (isFirstTimeVisit) {
     gateEl.classList.add('hidden');
-  } else if (localStorage.getItem(GATE_KEY) === 'ok') {
-    gateEl.classList.add('hidden');
+    // langFirstOverlay stays visible
+  } else {
+    langFirstOverlay.classList.add('hidden');
+    if (localStorage.getItem(BYPASS_KEY) === 'ok') {
+      window.garimpaBypass = true;
+      gateEl.classList.add('hidden');
+    } else if (localStorage.getItem(GATE_KEY) === 'ok') {
+      gateEl.classList.add('hidden');
+    }
   }
+
+  document.querySelectorAll('.lang-first-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      localStorage.setItem(LANG_KEY, btn.dataset.lang);
+      applyI18n();
+      langFirstOverlay.classList.add('hidden');
+      gateEl.classList.remove('hidden');
+    });
+  });
 
   const ONBOARDING_KEY = 'garimpa_onboarding_seen';
   const onboardingOverlay = document.getElementById('onboardingOverlay');
