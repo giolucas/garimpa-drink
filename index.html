@@ -484,6 +484,27 @@
     width: 100%;
   }
   .account-bar { z-index: 20; }
+  .header-top-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .lang-first-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    display: none;
+  }
+  #langFirstOverlay[data-closeable] .lang-first-close { display: block; }
   .header-top-actions {
     display: flex;
     gap: 5px;
@@ -1103,7 +1124,8 @@
 <div id="thankYouScreen" class="hidden">
   <p>Obrigado! :)</p>
 </div>
-<div id="langFirstOverlay">
+<div id="langFirstOverlay" style="position:relative">
+  <button type="button" class="lang-first-close" id="langFirstClose">&times;</button>
   <div class="lang-first-box">
     <div class="mylist-brand">
       <div class="logo-mark"><div class="sq"></div><div class="ci"></div><div class="ha"></div></div>
@@ -1278,7 +1300,10 @@
       <button type="button" class="account-login-btn" id="howToStartBtn">Como começar</button>
       <button type="button" class="account-login-btn" id="rankingBtn">Minha lista</button>
     </div>
-    <div class="account-bar" id="accountBar"></div>
+    <div class="header-top-right">
+      <div class="account-bar" id="accountBar"></div>
+      <button type="button" class="account-login-btn" id="langPermanentBtn">Idioma</button>
+    </div>
   </div>
 </div>
 <header>
@@ -1921,13 +1946,27 @@
     }
   }
 
+  var langFirstMode = 'gate';
+
   document.querySelectorAll('.lang-first-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       localStorage.setItem(LANG_KEY, btn.dataset.lang);
       applyI18n();
       langFirstOverlay.classList.add('hidden');
-      gateEl.classList.remove('hidden');
+      langFirstOverlay.removeAttribute('data-closeable');
+      if (langFirstMode === 'gate') gateEl.classList.remove('hidden');
     });
+  });
+
+  document.getElementById('langFirstClose').addEventListener('click', function() {
+    langFirstOverlay.classList.add('hidden');
+    langFirstOverlay.removeAttribute('data-closeable');
+  });
+
+  document.getElementById('langPermanentBtn').addEventListener('click', function() {
+    langFirstMode = 'change';
+    langFirstOverlay.setAttribute('data-closeable', '');
+    langFirstOverlay.classList.remove('hidden');
   });
 
   const ONBOARDING_KEY = 'garimpa_onboarding_seen';
@@ -2503,6 +2542,7 @@
     safe('gateOver18Label', t('gate.over18'));
     safeQ('#gateForm button[type="submit"]', t('gate.submit'));
     safe('langModalTitle', t('lang.title'));
+    safe('langPermanentBtn', t('nav.language'));
     document.querySelectorAll('.lang-option').forEach(function(btn) { btn.classList.toggle('active', btn.dataset.lang === getCurrentLang()); });
     var subtitleEl = document.getElementById('subtitleText'); if (subtitleEl) subtitleEl.innerHTML = t('header.subtitle');
     safe('subtitleAge', t('header.age'));
