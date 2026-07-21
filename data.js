@@ -17,7 +17,7 @@ const BARES = [
   { visitado: true, bar: "Das", instagram: "https://www.instagram.com/bar.das.sp", bairro: "Santa Cecília", estilo: "Bar Balcão", lat: -23.54399, lng: -46.65407, endereco: "R. Fortunato, 133" },
   { visitado: true, bar: "Koya", instagram: "https://www.instagram.com/koya88", bairro: "Santa Cecília", estilo: "Restaurante", lat: -23.53902, lng: -46.65247, endereco: "R. Jesuíno Pascoal, 21" },
   { visitado: true, bar: "Krozta", instagram: "https://www.instagram.com/kroztaaa", bairro: "Santa Cecília", estilo: "Restaurante", lat: -23.54198, lng: -46.6576, endereco: "R. Jesuíno Pascoal, 101" },
-  { visitado: false, bar: "Café AnarCord", instagram: "https://www.instagram.com/caffeanarcord", bairro: "Jardins", estilo: "Restaurante", lat: -23.5617, lng: -46.6548, endereco: "R. Padre João Manuel, 826" },
+  { visitado: false, bar: "Café AnarCord", instagram: "https://www.instagram.com/caffeanarcord", bairro: "Jardins", estilo: "Restaurante", lat: -23.5617, lng: -46.6548, endereco: "R. Padre João Manuel, 826", novidadePost: "https://www.instagram.com/p/DbBixNwkU_y/?img_index=1&igsh=MWxjeGI2dTlmN2xj" },
   { visitado: true, bar: "Riviera", instagram: "https://www.instagram.com/rivierabarsp", bairro: "Jardins", estilo: "Restaurante", lat: -23.56027, lng: -46.65786, endereco: "Av. Paulista, 2584" },
   { visitado: true, bar: "Raio que o Parta", instagram: "https://www.instagram.com/raioqueoparta.bar", bairro: "Barra Funda", estilo: "Restaurante", lat: -23.5271, lng: -46.6621, endereco: "R. Margarida, 30" },
   { visitado: false, bar: "Bandeira Bandeira", instagram: "https://www.instagram.com/bandeirabandeirabar", bairro: "Barra Funda", estilo: "Bar Boteco", lat: -23.52567, lng: -46.66516, endereco: "R. Sousa Lima, 81" },
